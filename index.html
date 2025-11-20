@@ -2,76 +2,142 @@
 <html lang="ko">
 <head>
    <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>퇴마 시뮬레이션: 초기화면 (Gothic Edition)</title>
+   <!-- Tailwind CSS CDN -->
    <script src="https://cdn.tailwindcss.com"></script>
    <style>
+      /* [1. 폰트 적용] 제공해주신 EutmanGungseo 폰트 통합 */
+      @font-face {
+         font-family: 'EutmanGungseo';
+         src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKGUNG.woff2') format('woff2');
+         font-weight: normal;
+         font-display: swap;
+      }
+
+      /* 폰트: 여성향 고딕 스타일 Playfair Display (일반 텍스트) */
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+      /* 네이비/골드 Gothic 스타일 적용 */
+      :root {
+         --color-bg: #0D0D1A;
+         --color-surface: #1B1B2A;
+         --color-primary: #DAA520; /* Goldenrod */
+         --color-text: #E0E0E0;
+         --color-accent: #4B0082; /* Deep Indigo for secondary accent */
+      }
+
       body {
-         font-family: sans-serif;
-         background: #0d0d0d;
-         color: #eee;
+         font-family: 'Playfair Display', serif;
+         background-color: var(--color-bg);
+         color: var(--color-text);
+         min-height: 100vh;
          display: flex;
          justify-content: center;
+         align-items: center;
          padding: 2rem;
+         text-align: center;
       }
 
-      .container {
-         max-width: 1000px;
+      .main-container {
          width: 100%;
-         background: #1a1a1a;
-         padding: 2rem;
+         max-width: 1024px;
+         background-color: var(--color-surface);
+         border: 2px solid var(--color-accent);
          border-radius: 8px;
-         border: 1px solid #333;
+         box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+         padding: 1.5rem 3rem 3rem 3rem;
+         position: relative;
       }
 
-      .btn {
-         width: 100%;
-         padding: 10px;
-         margin-top: 10px;
-         background: #333;
-         color: white;
-         border: 1px solid #555;
+      .header-title {
+         /* [1. 폰트 적용] 제목에 EutmanGungseo 적용 */
+         font-family: 'EutmanGungseo', sans-serif;
+         font-size: 3.5rem;
+         font-weight: normal;
+         letter-spacing: 0.10em;
+         color: var(--color-primary);
+         text-shadow: 0 0 15px rgba(218, 165, 32, 0.6);
+         margin-top: 1rem;
+      }
+
+      /* 버튼 및 기타 스타일은 이전과 동일하게 유지 */
+      .mono-button {
+         padding: 0.75rem 2rem;
+         border-radius: 4px;
+         font-weight: 700;
+         transition: all 0.3s;
+         background-color: #333344;
+         color: var(--color-text);
+         border: 1px solid #555566;
          cursor: pointer;
       }
 
-         .btn:hover {
-            background: #444;
-            border-color: #f55;
+         .mono-button:hover {
+            background-color: #444455;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.4);
          }
 
-      .btn-acc {
-         background: #f55;
-         color: #111;
-         font-weight: bold;
+      .accent-button {
+         background-color: var(--color-primary);
+         color: var(--color-bg);
+         border-color: var(--color-primary);
       }
 
-      .btn:disabled {
-         opacity: 0.5;
-         cursor: not-allowed;
-      }
+         .accent-button:hover {
+            background-color: #e5b000;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.8);
+         }
 
+         .accent-button:disabled {
+            background-color: #555;
+            color: #888;
+            border-color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+         }
+
+      /* 카드 및 이미지 스타일 */
       .card {
-         background: #282828;
-         border: 2px solid transparent;
-         cursor: pointer;
-         position: relative;
+         background: #28283a;
+         border: 3px solid transparent;
          border-radius: 6px;
          overflow: hidden;
-         transition: 0.2s;
+         cursor: pointer;
+         transition: all 0.2s;
+         position: relative;
       }
 
-         .card.selected {
-            border-color: #4bcffa;
+         .card:hover {
+            border-color: #DAA520;
          }
 
-         .card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            filter: grayscale(1);
-         }
+      #grid_partner .card.selected {
+         border-color: #4bcffa;
+         box-shadow: 0 0 15px rgba(75, 207, 250, 0.7);
+      }
 
-         .card.selected img {
-            filter: grayscale(0);
-         }
+      #grid_partner.one-selected .card:not(.selected) {
+         opacity: 0.35;
+      }
+
+      .char-image {
+         width: 100%;
+         height: 270px;
+         object-fit: cover;
+         filter: grayscale(1) brightness(0.6);
+         transition: filter 0.3s;
+      }
+
+      #grid_wi .char-image {
+         height: 150px;
+      }
+
+      .card.selected .char-image {
+         filter: grayscale(0) brightness(1);
+      }
 
       .card-text {
          position: absolute;
@@ -84,7 +150,7 @@
       }
 
       .hidden {
-         display: none;
+         display: none !important;
       }
 
       .grid-4 {
@@ -96,135 +162,394 @@
 </head>
 <body>
 
-   <div class="container">
+   <div class="main-container">
+
+      <!-- [1. UI 수정] 언어 선택 드롭다운 상단 배치 -->
+      <div class="flex justify-end mb-4 pt-2">
+         <select id="langSelect" class="bg-gray-700 text-white p-2 rounded text-sm">
+            <option value="ko">한국어 (Korean)</option>
+            <option value="en">English (영어)</option>
+         </select>
+      </div>
+
       <!-- Page 1 -->
-      <div id="p1">
-         <h1 class="text-3xl font-bold text-red-500 mb-4">퇴마 시뮬레이션</h1>
-         <button class="btn btn-acc" onclick="go('p2')">시작하기 →</button>
+      <div id="p1" class="space-y-8">
+         <h1 class="header-title" data-ko="퇴마 시뮬레이션: 그림자의 장" data-en="Exorcism Sim: Chapter of Shadows">
+            퇴마 시뮬레이션: 그림자의 장
+         </h1>
+         <p data-ko="이단과 신성이 교차하는 세계에서, 당신의 선택이 운명을 결정합니다." data-en="In a world where heresy meets the divine, your choice determines destiny." class="text-xl text-gray-300 mb-6"></p>
+
+         <div class="p-5 border border-gray-700 rounded-lg bg-black/30">
+            <h2 data-ko="시뮬레이션 가이드" data-en="Simulation Guide" class="text-2xl font-bold mb-3 text-yellow-400"></h2>
+            <ul class="list-disc list-inside text-gray-400 space-y-2 text-left">
+               <li data-ko="주제: 엑소시즘/퇴마 다크 판타지 로맨스 시뮬레이션입니다." data-en="Theme: Exorcism/Dark Fantasy Romance Simulation."></li>
+               <li data-ko="시스템: 정화도, 오염도, 턴제 전투, QTE 히든 이벤트 등 시스템 중심 프롬프팅으로 진행됩니다." data-en="System: Driven by system-centric prompting (Purity/Corruption, Turn-based Combat, QTE hidden events)."></li>
+            </ul>
+         </div>
+
+         <div class="space-y-4">
+            <button id="externalLinkBtn" class="mono-button" data-ko="📘 세계관 / 규칙 보기 (외부링크)" data-en="📘 View Lore / Rules (External Link)">
+               📘 세계관 / 규칙 보기 (외부링크)
+            </button>
+            <button id="btn_p1_next" class="mono-button accent-button" onclick="go('p2')" data-ko="Step 1. 캐릭터 WI 선택하기 →" data-en="Step 1. Select Character WI →">
+               Step 1. 캐릭터 WI 선택하기 →
+            </button>
+         </div>
       </div>
 
       <!-- Page 2: WI Toggle -->
       <div id="p2" class="hidden">
-         <h2 class="text-xl font-bold mb-4">Step 1. 캐릭터 선택</h2>
-         <div id="grid_wi" class="grid-4"></div>
-         <button class="btn btn-acc" onclick="go('p3')">다음 →</button>
+         <h2 class="text-3xl font-bold pb-3 border-b border-gray-600 text-yellow-400" data-ko="Step 1. 캐릭터 WI 토글: 활성화할 조력자/존재를 선택하세요" data-en="Step 1. Character WI Toggle: Select Wits to Enable"></h2>
+
+         <div class="p-4 mt-4 bg-[#28283a] border border-gray-700 rounded-lg">
+            <p class="text-sm text-yellow-300 mb-4" data-ko="[가이드] 선택한 캐릭터의 WI만 ST의 채팅에 영향을 줍니다. 파트너 캐릭터를 Chat Char로 설정할 예정이라면 WI를 미리 켜두세요." data-en="[Guide] Only selected Wits will affect the chat. If you plan to set a Partner as the Chat Char, ensure their WI is enabled."></p>
+            <!-- 캐릭터 그리드 -->
+            <div id="grid_wi" class="grid-4"></div>
+         </div>
+
+         <div class="flex gap-4 pt-6">
+            <button class="mono-button" onclick="go('p1')" data-ko="← 초기 화면으로 돌아가기" data-en="← Back to Start"></button>
+            <button class="mono-button accent-button" onclick="go('p3')" data-ko="Step 2. 시나리오 확정하기 →" data-en="Step 2. Confirm Scenario →">
+               Step 2. 시나리오 확정하기 →
+            </button>
+         </div>
       </div>
 
       <!-- Page 3: Scenario -->
       <div id="p3" class="hidden">
-         <h2 class="text-xl font-bold mb-4">Step 2. 시나리오</h2>
-         <div class="flex gap-4">
-            <div class="w-1/2">
-               <h3>파트너 선택</h3>
+         <h2 class="text-3xl font-bold pb-3 border-b border-gray-600 text-yellow-400" data-ko="Step 2. 시나리오 선택: 이야기의 시작점을 결정하세요" data-en="Step 2. Choose Scenario: Determine the starting point"></h2>
+
+         <div class="flex flex-col md:flex-row gap-6 mt-4">
+            <!-- 파트너 선택 -->
+            <div class="md:w-1/2 p-4 bg-[#28283a] border border-gray-700 rounded-lg">
+               <h3 class="text-xl font-bold text-yellow-300 mb-2" data-ko="① 파트너와 함께 시작" data-en="① Start with a Partner"></h3>
+               <p class="text-gray-400 text-sm mb-4" data-ko="파트너의 확정 프롤로그로 시작하며, Chat Char가 됩니다. 두 번 클릭하면 선택 해제됩니다." data-en="Starts with Partner's confirmed prologue as Chat Char. Double-click to deselect."></p>
                <div id="grid_partner" class="grid-4" style="grid-template-columns:repeat(2,1fr)"></div>
             </div>
-            <div class="w-1/2">
-               <h3>랜덤 시나리오</h3>
-               <textarea id="rndIn" class="w-full bg-gray-800 p-2" rows="3"></textarea>
-               <button id="btnRnd" class="btn">생성</button>
+
+            <!-- 랜덤 시나리오 -->
+            <div class="md:w-1/2 p-4 bg-[#28283a] border border-gray-700 rounded-lg">
+               <h3 class="text-xl font-bold text-yellow-300 mb-2" data-ko="② 랜덤 시나리오 (자유 시작)" data-en="② Random Scenario (Free Start)"></h3>
+               <p class="text-gray-400 text-sm mb-4" data-ko="파트너 없이 자유로운 설정으로 시작합니다." data-en="Start freely without a designated Chat Partner."></p>
+               <textarea id="rndIn" class="w-full bg-gray-800 p-2 text-gray-200" rows="3" data-ko-ph="예: 미카엘과 루시퍼가 동시에 등장하는 봉인 해제 시나리오." data-en-ph="Ex: A scenario where Michael and Lucifer appear simultaneously during a seal release."></textarea>
+               <button id="btnRnd" class="btn mono-button" data-ko="🎲 랜덤 시나리오 생성" data-en="🎲 Generate Random Scenario">생성</button>
             </div>
          </div>
-         <div id="preview" class="mt-4 p-4 bg-gray-800 hidden"></div>
-         <button id="btnFinal" class="btn btn-acc" disabled onclick="go('p4')">최종 확인 →</button>
-         <button class="btn" onclick="go('p2')">← 뒤로</button>
+
+         <!-- 미리보기 -->
+         <div id="preview" class="mt-4 p-4 bg-[#28283a] border border-gray-600 rounded-lg hidden">
+            <h3 class="font-bold text-yellow-400 mb-2" data-ko="프롤로그 미리보기:" data-en="Prologue Preview:"></h3>
+            <p id="previewText" class="text-sm italic text-gray-300"></p>
+         </div>
+
+         <div class="flex gap-4 pt-6">
+            <button class="mono-button" onclick="go('p2')" data-ko="← WI 선택" data-en="← Back to WI"></button>
+            <button id="btnFinal" class="mono-button accent-button" disabled onclick="go('p4')" data-ko="최종 확인 →" data-en="Final Confirm →">
+               최종 확인 →
+            </button>
+         </div>
       </div>
 
       <!-- Page 4: Summary -->
       <div id="p4" class="hidden">
-         <h2 class="text-xl font-bold mb-4">확인</h2>
-         <div id="summary" class="bg-gray-800 p-4"></div>
-         <button id="btnStart" class="btn btn-acc mt-4">시뮬레이션 시작</button>
-         <button class="btn" onclick="go('p3')">← 수정</button>
+         <h2 class="text-3xl font-bold text-yellow-400 mb-4" data-ko="최종 설정 확인" data-en="Final Configuration"></h2>
+
+         <div class="p-6 bg-[#28283a] border border-gray-600 rounded-lg text-left space-y-4">
+            <p><strong><span data-key="summaryScenarioType">시작 유형:</span></strong> <span id="summary_type" class="text-yellow-300"></span></p>
+            <p><strong><span data-key="summaryPartnerName">메인 Chat Char:</span></strong> <span id="summary_partner" class="text-yellow-300"></span></p>
+            <p><strong><span data-key="summaryActiveWIs">활성화된 WI:</span></strong> <span id="summary_wis" class="text-blue-300 text-sm"></span></p>
+            <div class="border-t border-gray-700 pt-4 mt-4">
+               <p class="text-yellow-400 font-bold mb-2" data-key="summaryPrologueTitle">시작 프롤로그:</p>
+               <p id="summary_text" class="text-sm italic text-gray-400"></p>
+            </div>
+         </div>
+
+         <div class="flex gap-4 pt-6">
+            <button class="mono-button" onclick="go('p3')" data-ko="← 수정" data-en="← Modify"></button>
+            <button id="btnStart" class="mono-button accent-button" data-ko="▶️ 시뮬레이션 시작" data-en="▶️ Start Simulation">
+               ▶️ 시뮬레이션 시작
+            </button>
+         </div>
       </div>
    </div>
 
    <script>
-// 안전한 변수 선언
+// --- 전역 데이터 및 상태 ---
 var chars = [
-    {id:'priest', name:'신부', img:'https://placehold.co/100', isP:true, text:'신부 프롤로그'},
-    {id:'shaman', name:'주술사', img:'https://placehold.co/100', isP:true, text:'주술사 프롤로그'},
-    {id:'exorcist', name:'퇴마사', img:'https://placehold.co/100', isP:true, text:'퇴마사 프롤로그'},
-    {id:'cultist', name:'숭배자', img:'https://placehold.co/100', isP:true, text:'숭배자 프롤로그'},
-    {id:'michael', name:'미카엘', img:'https://placehold.co/100', isP:false},
-    {id:'lucifer', name:'루시퍼', img:'https://placehold.co/100', isP:false}
+    {id:'priest', name:'요한 신부', type:'사제', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Priest', text:'어둠 속에서 속죄를 구하는 한 남자의 이야기. 고대 유물의 저주를 풀기 위해 폐허가 된 수도원으로 향하며 당신과의 만남이 시작된다.'},
+    {id:'shaman', name:'샤카 주술사', type:'주술사', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Shaman', text:'신성한 불꽃으로 악을 멸하는 주술사. 미지의 전염병에 걸린 마을을 구하기 위한 여정에서, 당신은 그의 강력한 조력자가 된다.'},
+    {id:'exorcist', name:'현대 퇴마사', type:'퇴마사', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Exorcist', text:'빠른 판단력과 현대 기술을 사용하는 냉철한 퇴마사. 도시의 랜드마크에서 발생하는 연쇄 실종 사건을 해결하기 위해 당신과 파트너를 맺는다.'},
+    {id:'cultist', name:'아마추어', type:'숭배자', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Cultist', text:'악마를 소환하려다 실수로 당신을 만난 아마추어 숭배자. 수습 불가능한 영적 사태를 해결하기 위해 당신에게 매달리는 어설픈 파트너.'},
+
+    // 비인간계
+    {id:'michael', name:'미카엘', type:'천사', isP:false, img:'https://placehold.co/150x225/11112d/DAA520?text=Mikael'},
+    {id:'uriel', name:'우리엘', type:'천사', isP:false, img:'https://placehold.co/150x225/11112d/DAA520?text=Uriel'},
+    {id:'lucifer', name:'루시퍼', type:'타천사', isP:false, img:'https://placehold.co/150x225/2d1111/DAA520?text=Lucifer'},
+    {id:'mephisto', name:'메피스토', type:'악마', isP:false, img:'https://placehold.co/150x225/2d1111/DAA520?text=Mephisto'},
+    {id:'astaroth', name:'아스타로트', type:'악마', isP:false, img:'https://placehold.co/150x225/2d1111/DAA520?text=Astaroth'},
+    {id:'vishnu', name:'비슈누', type:'힌두신', isP:false, img:'https://placehold.co/150x225/112d11/DAA520?text=Vishnu'},
+    {id:'agni', name:'아그니', type:'힌두신', isP:false, img:'https://placehold.co/150x225/112d11/DAA520?text=Agni'},
+    {id:'chouno', name:'천호', type:'동양영물', isP:false, img:'https://placehold.co/150x225/2d2d11/DAA520?text=Chouno'},
+    {id:'kirin', name:'기린', type:'환수', isP:false, img:'https://placehold.co/150x225/2d2d11/DAA520?text=Kirin'},
 ];
 
-var state = { wis: [], pid: null, scType: 'none', scText: '' };
-var apiKey = ""; // 자동 주입
+var state = { wis: [], pid: null, scType: 'none', scText: '', currentPage: 'p1' };
+var currentLang = 'ko';
 
-function go(id) {
-    document.querySelectorAll('div[id^="p"]').forEach(d => d.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    if(id==='p2') renderWI();
-    if(id==='p3') renderP();
-    if(id==='p4') renderSum();
-}
+var apiKey = "";
+var apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
 
-function renderWI() {
-    var h = '';
-    chars.forEach(c => {
-        var s = state.wis.includes(c.id) ? 'selected' : '';
-        h += `<div class="card ${s}" onclick="tWI('${c.id}', this)"><img src="${c.img}"><div class="card-text">${c.name}</div></div>`;
-    });
-    document.getElementById('grid_wi').innerHTML = h;
-}
-
-function tWI(id, el) {
-    if(state.wis.includes(id)) { state.wis = state.wis.filter(x=>x!==id); el.classList.remove('selected'); }
-    else { state.wis.push(id); el.classList.add('selected'); }
-}
-
-function renderP() {
-    var h = '';
-    chars.filter(c=>c.isP).forEach(c => {
-        var s = (state.pid === c.id) ? 'selected' : '';
-        h += `<div class="card ${s}" onclick="selP('${c.id}')"><img src="${c.img}"><div class="card-text">${c.name}</div></div>`;
-    });
-    document.getElementById('grid_partner').innerHTML = h;
-}
-
-function selP(id) {
-    state.pid = id; state.scType='partner';
-    state.scText = chars.find(c=>c.id===id).text;
-    renderP(); check();
-}
-
-document.getElementById('btnRnd').onclick = async function() {
-    this.innerText = "...";
-    var q = document.getElementById('rndIn').value;
-    try {
-        var r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({contents:[{parts:[{text:"Scenario intro for: "+q}]}]})
-        });
-        var d = await r.json();
-        state.scText = d.candidates[0].content.parts[0].text;
-        state.scType = 'random'; state.pid = null;
-        renderP(); check();
-    } catch(e){alert('Error');}
-    this.innerText = "생성";
+// --- 다국어 번역 데이터 ---
+var translations = {
+    ko: {
+        'headerTitle': '퇴마 시뮬레이션: 그림자의 장', 'subTitle': '이단과 신성이 교차하는 세계에서, 당신의 선택이 운명을 결정합니다.', 'guideTitle': '시뮬레이션 가이드', 'guideTheme': '주제: 엑소시즘/퇴마 다크 판타지 로맨스 시뮬레이션입니다.', 'guideSystem': '시스템: 정화도, 오염도, 턴제 전투, QTE 히든 이벤트 등 시스템 중심 프롬프팅으로 진행됩니다.', 'btn_p1_next': 'Step 1. 캐릭터 WI 선택하기 →', 'step1Title': 'Step 1. 캐릭터 WI 토글: 활성화할 조력자/존재를 선택하세요', 'guideToggle': '[가이드] 선택한 캐릭터의 WI만 ST의 채팅에 영향을 줍니다. 파트너 캐릭터를 Chat Char로 설정할 예정이라면 WI를 미리 켜두세요.', 'step2Title': 'Step 2. 시나리오 선택: 이야기의 시작점을 결정하세요', 'partnerTitle': '① 파트너와 함께 시작', 'partnerDesc': '파트너의 확정 프롤로그로 시작하며, Chat Char가 됩니다. 두 번 클릭하면 선택 해제됩니다.', 'randomTitle': '② 랜덤 시나리오 (자유 시작)', 'randomDesc': '파트너 없이 자유로운 설정으로 시작합니다.', 'rndPh': '예: 미카엘과 루시퍼가 동시에 등장하는 봉인 해제 시나리오.', 'btnRnd': '🎲 랜덤 시나리오 생성', 'previewTitle': '프롤로그 미리보기:', 'btnBackStart': '← 초기 화면으로 돌아가기', 'btnBackWI': '← WI 선택', 'btnFinal': '최종 확인 →', 'step4Title': '최종 설정 확인', 'summaryScenarioType': '시작 유형:', 'summaryPartnerName': '메인 Chat Char:', 'summaryActiveWIs': '활성화된 WI:', 'summaryPrologueTitle': '시작 프롤로그:', 'btnModify': '← 수정', 'btnStart': '▶️ 시뮬레이션 시작'
+    },
+    en: {
+        'headerTitle': 'Exorcism Sim: Chapter of Shadows', 'subTitle': 'In a world where heresy meets the divine, your choice determines destiny.', 'guideTitle': 'Simulation Guide', 'guideTheme': 'Theme: Exorcism/Dark Fantasy Romance Simulation.', 'guideSystem': 'System: Driven by system-centric prompting (Purity/Corruption, Turn-based Combat, QTE hidden events).', 'btn_p1_next': 'Step 1. Select Character WI →', 'step1Title': 'Step 1. Character WI Toggle: Select Wits to Enable', 'guideToggle': '[Guide] Only selected Wits will affect the chat. If you plan to set a Partner as the Chat Char, ensure their WI is enabled.', 'step2Title': 'Step 2. Choose Scenario: Determine the starting point', 'partnerTitle': '① Start with a Partner', 'partnerDesc': 'Starts with Partner\'s confirmed prologue as Chat Char. Double-click to deselect.', 'randomTitle': '② Random Scenario (Free Start)', 'randomDesc': 'Start freely without a designated Chat Partner.', 'rndPh': 'Ex: A scenario where Michael and Lucifer appear simultaneously during a seal release.', 'btnRnd': '🎲 Generate Random Scenario', 'previewTitle': 'Prologue Preview:', 'btnBackStart': '← Back to Start', 'btnBackWI': '← Back to WI', 'btnFinal': 'Final Confirm →', 'step4Title': 'Final Configuration', 'summaryScenarioType': 'Scenario Type:', 'summaryPartnerName': 'Main Chat Char:', 'summaryActiveWIs': 'Active Wits:', 'summaryPrologueTitle': 'Starting Prologue:', 'btnModify': '← Modify', 'btnStart': '▶️ Start Simulation'
+    }
 };
 
-function check() {
-    var p = document.getElementById('preview');
-    var b = document.getElementById('btnFinal');
-    if(state.scType !== 'none') {
-        p.innerText = state.scText; p.classList.remove('hidden');
-        b.disabled = false;
+// --- 기능 로직 ---
+
+function go(id) {
+    document.querySelectorAll('div[id^="p"]').forEach(function(d) { d.classList.add('hidden'); });
+    document.getElementById(id).classList.remove('hidden');
+
+    state.currentPage = id;
+    updateLang(currentLang);
+
+    if (id === 'p2') renderWI();
+    if (id === 'p3') {
+        renderP();
+        updateScenarioPreview(state.scType);
+    }
+    if (id === 'p4') renderSum();
+}
+
+function updateLang(lang) {
+    var dict = translations[lang];
+    if (!dict) return;
+
+    document.querySelectorAll('[data-ko], [data-en]').forEach(function(el) {
+        var key = el.getAttribute('data-' + lang);
+        if (key) { el.innerText = key; }
+    });
+
+    var rndInput = document.getElementById('rndIn');
+    if (rndInput) {
+        var phKey = (lang === 'ko') ? rndInput.getAttribute('data-ko-ph') : rndInput.getAttribute('data-en-ph');
+        if (phKey) { rndInput.placeholder = phKey; }
+    }
+
+    if (state.currentPage === 'p3') {
+        updateScenarioPreview(state.scType);
     }
 }
 
-function renderSum() {
-    document.getElementById('summary').innerHTML = `타입: ${state.scType}<br>WI: ${state.wis}<br><br>${state.scText}`;
+// Page 2: WI 토글 렌더링
+function renderWI() {
+    var grid = document.getElementById('grid_wi');
+    var html = "";
+
+    chars.forEach(function(c) {
+        var isSelected = state.wis.includes(c.id) ? 'selected' : '';
+        var textColor = c.isP ? 'text-yellow-400' : 'text-blue-400';
+
+        html += '<div class="card ' + isSelected + '" onclick="tWI(\'' + c.id + '\', this)">' +
+                '<img src="' + c.img + '" class="char-image">' +
+                '<div class="card-text">' +
+                '<span class="block font-bold text-white">' + c.name + '</span>' +
+                '<span class="block text-xs ' + textColor + '">' + c.type + '</span>' +
+                '</div></div>';
+    });
+    grid.innerHTML = html;
 }
 
-document.getElementById('btnStart').onclick = function() {
-    var cmd = `/run set_char ${state.pid||'default'}; /run set_wits ${state.wis}; /next_response ${state.scText}`;
-    alert("명령어:\n"+cmd);
-    go('p1');
+function tWI(id, el) {
+    // [2. WI/파트너 연동] P2에서 수동으로 토글 시 state.wis 업데이트
+    if (state.wis.includes(id)) { state.wis = state.wis.filter(function(x) { return x !== id; }); el.classList.remove('selected'); }
+    else { state.wis.push(id); el.classList.add('selected'); }
+}
+
+// Page 3: 파트너 선택 렌더링
+function renderP() {
+    var grid = document.getElementById('grid_partner');
+    var html = "";
+
+    var partners = chars.filter(function(c) { return c.isP; });
+    partners.forEach(function(c) {
+        var isSelected = (state.pid === c.id) ? 'selected' : '';
+        html += '<div class="card ' + isSelected + '" onclick="selP(\'' + c.id + '\')">' +
+                '<img src="' + c.img + '" class="char-image">' +
+                '<div class="card-text"><span class="font-bold text-white">' + c.name + '</span></div>' +
+                '</div>';
+    });
+    grid.innerHTML = html;
+
+    if (state.pid) { grid.classList.add('one-selected'); } else { grid.classList.remove('one-selected'); }
+}
+
+// 파트너 선택/해제 토글 로직
+function selP(id) {
+    var partner = chars.find(function(c) { return c.id === id; });
+
+    if (state.pid === id) {
+        // 더블 클릭 (선택 해제)
+
+        // [2. WI/파트너 연동] 선택 해제 시 WI 목록에서도 제거
+        state.wis = state.wis.filter(function(x) { return x !== id; });
+
+        state.pid = null;
+        state.scType = 'none';
+        state.scText = '';
+    } else {
+        // 새 파트너 선택
+        state.pid = id;
+        state.scType = 'partner';
+        state.scText = partner.text;
+
+        // [2. WI/파트너 연동] 새 파트너 선택 시 WI 목록에 강제 추가
+        if (!state.wis.includes(id)) {
+            state.wis.push(id);
+        }
+    }
+
+    renderP();
+    updateScenarioPreview(state.scType);
+}
+
+// 시나리오 미리보기 업데이트 및 버튼 활성화
+function updateScenarioPreview(type) {
+    var previewDiv = document.getElementById('preview');
+    var textP = document.getElementById('previewText');
+    var nextBtn = document.getElementById('btnFinal');
+
+    var msg = (currentLang === 'ko') ? "파트너를 선택하거나 랜덤 시나리오를 생성해 주세요." : "Select a partner or generate a random scenario.";
+
+    if (state.scType !== 'none' && state.scText) {
+        nextBtn.disabled = false;
+        nextBtn.innerText = (currentLang === 'ko' ? "최종 확인 →" : "Final Confirm →");
+        previewDiv.classList.remove('hidden');
+        msg = state.scText;
+    } else {
+        nextBtn.disabled = true;
+        nextBtn.innerText = (currentLang === 'ko' ? "선택 필요" : "Selection Required");
+        previewDiv.classList.add('hidden');
+    }
+
+    textP.innerText = msg;
+}
+
+// 랜덤 시나리오 생성 (API)
+document.getElementById('btnRnd').onclick = async function() {
+    var btn = this;
+    var input = document.getElementById('rndIn').value;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner mr-2"></span> ' + (currentLang === 'ko' ? '생성 중...' : 'Generating...');
+
+    // 파트너 선택 해제 (자유 시작)
+    state.pid = null;
+    renderP();
+
+    // [3. 랜덤 프롬프트 강화] 활성화된 WI 목록을 가져와 프롬프트에 삽입
+    var activeCharNames = chars.filter(function(c) { return state.wis.includes(c.id); }).map(function(c) { return c.name; });
+    var charPrompt = "";
+
+    if (activeCharNames.length > 0) {
+        charPrompt = (currentLang === 'ko' ?
+            `현재 WI가 활성화된 캐릭터 목록은 [${activeCharNames.join(', ')}] 입니다. 이 중 1~3명의 캐릭터를 시나리오에 포함해주세요. (필수 아님, 시나리오 완성도를 위해 등장하지 않아도 무방)` :
+            `The following characters have active Wits: [${activeCharNames.join(', ')}]. Please integrate 1 to 3 of them into the scenario, but feel free to omit them if it fits the narrative better.`);
+    } else {
+         charPrompt = (currentLang === 'ko' ?
+            `현재 활성화된 WI 캐릭터는 없습니다. 시나리오는 완전히 자유로운 주제로 생성해주세요.` :
+            `No Wits are currently active. Generate a scenario on a completely free topic.`);
+    }
+
+    var userQuery = (currentLang === 'ko' ?
+        `Gothic horror 퇴마 임무 시나리오를 2-3 문장으로 작성해 주세요. 사용자 요청: ${input}. ${charPrompt}` :
+        `Generate a 2-3 sentence gothic horror exorcism mission scenario. User request: ${input}. ${charPrompt}`);
+
+    try {
+        var response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: "Act as a dark fantasy RPG master. Respond only with the scenario text in the language requested by the user." }] }
+            })
+        });
+
+        var data = await response.json();
+        var generatedText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text ? data.candidates[0].content.parts[0].text.trim() : null;
+
+        if (generatedText) {
+            state.scText = generatedText;
+            state.scType = 'random';
+        } else {
+            throw new Error("Empty response");
+        }
+
+    } catch (e) {
+        console.error("API Call Error:", e);
+        var errMsg = (currentLang === 'ko') ? "API 연결 오류입니다. ST에 키가 설정되어 있는지 확인해주세요." : "API connection error. Check if your API key is set in ST.";
+        alert(errMsg);
+        state.scText = errMsg;
+        state.scType = 'none';
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = (currentLang === 'ko') ? '🎲 랜덤 시나리오 생성' : '🎲 Generate Random Scenario';
+    updateScenarioPreview(state.scType);
 };
 
-go('p1');
+// Page 4: 요약
+function renderSum() {
+    var p = chars.find(function(c) { return c.id === state.pid; });
+    var pName = p ? p.name : (currentLang === 'ko' ? "없음 (자유 시작)" : "None (Free Start)");
+
+    var sType = (state.scType === 'random') ? (currentLang === 'ko' ? "랜덤" : "Random") : (currentLang === 'ko' ? "파트너 확정" : "Partner Confirmed");
+
+    document.getElementById('summary_type').innerText = sType;
+    document.getElementById('summary_partner').innerText = pName;
+    document.getElementById('summary_wis').innerText = state.wis.length + (currentLang === 'ko' ? "명 활성화: " : " active: ") + state.wis.join(', ');
+    document.getElementById('summary_text').innerText = state.scText;
+}
+
+// 최종 시작
+document.getElementById('btnStart').onclick = function() {
+    var partnerId = state.pid || 'default';
+
+    // 최종 WI 목록은 현재 state.wis에 저장되어 있으며, selP에서 이미 Chat Char가 포함/제거 처리됨.
+    var finalWIs = state.wis.slice();
+
+    // 활성화된 WI 중 메인 파트너(Chat Char)는 제외 (ST의 set_wits 기능에 맞춤)
+    var wits = finalWIs.filter(function(id) { return id !== partnerId; }).join(',');
+    var text = document.getElementById('summary_text').innerText;
+
+    var initialPrompt = (currentLang === 'ko' ?
+        `[시뮬레이션 시작 - 메인 상대: ${partnerId}] 당신의 임무가 시작되었습니다. 현재 시나리오: "${text}". 이 스크립트에 이어서 첫 대사를 시작하세요. 앞으로 시스템 기반 프롬프팅으로 진행됩니다. (활성 WI: ${wits})` :
+        `[SIM START - Main Target: ${partnerId}] Your mission begins. Scenario: "${text}". Continue with the first response. The session will now proceed with system-based prompting. (Active WIs: ${wits})`);
+
+    var cmd = '/run set_char ' + partnerId + '; /run set_wits ' + wits + '; /next_response ' + initialPrompt;
+
+    alert("ST 실행 명령어 (복사됨):\n" + cmd);
+
+    go('p1');
+    state = { wis: [], pid: null, scType: 'none', scText: '', currentPage: 'p1' }; // 상태 초기화
+};
+
+// --- 초기화 및 이벤트 리스너 ---
+document.addEventListener('DOMContentLoaded', function() {
+    // 언어 선택 이벤트
+    document.getElementById('langSelect').addEventListener('change', function() {
+        currentLang = this.value;
+        go(state.currentPage);
+    });
+
+    // 초기 시작
+    go('p1');
+});
    </script>
 </body>
 </html>
