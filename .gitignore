@@ -1,0 +1,9 @@
+# VS Code 및 Visual Studio 캐시 폴더 무시
+    .vs/
+    
+    # Git이 자동으로 생성하는 폴더 및 파일
+    *.log
+    *.tmp
+    
+    # node_modules (필요하다면)
+    # node_modules/
