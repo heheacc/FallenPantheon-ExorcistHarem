@@ -3,199 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>엑소시즘 시뮬레이션: 파트너 선택</title>
+    <title>퇴마 시뮬레이션: 초기화면</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-/* -------------------------------------------
-   A. 모노톤 오컬트 스타일 (CSS) 
-   ------------------------------------------- */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Georgia', 'Malgun Gothic', serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        /* 모노톤/고딕 스타일 기본 설정 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d0d; /* 극도로 어두운 배경 */
+            color: #e0e0e0; /* 밝은 회색 텍스트 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
 
-body {
-    /* ST의 iframe 배경색과 유사하게 투명하게 설정 */
-    background: transparent; 
-    color: #d8d8d8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+        .main-container {
+            width: 100%;
+            max-width: 1024px; /* 가로 배열을 위해 너비 확장 */
+            background-color: #1a1a1a; /* 컨테이너 배경 */
+            border: 2px solid #333; /* 얇은 테두리 */
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 2.5rem;
+            transition: all 0.5s ease;
+        }
 
-.selection-container {
-    width: 90%; max-width: 900px; margin: 25px auto; padding: 40px;
-    /* 짙은 네이비 배경, 오컬트 무드 */
-    background: linear-gradient(135deg, rgba(15, 15, 26, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
-    border: 2px solid rgba(101, 85, 68, 0.6); border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(240, 230, 140, 0.05), 0 0 60px rgba(101, 85, 68, 0.2);
-    animation: fadeIn 1s ease-out; /* 로드 시 페이드인 */
-}
+        .header-title {
+            @apply text-5xl font-extrabold mb-4 tracking-widest;
+            color: #ff4757; /* 엑센트 색상: 강렬한 빨강 */
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+        }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+        .mono-button {
+            @apply px-8 py-3 rounded-md font-bold text-lg transition duration-300 transform hover:scale-[1.03] shadow-lg;
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+        }
 
-.title-header {
-    color: #e8dcc8; text-align: center; margin-bottom: 15px;
-    font-size: 2.5em; font-weight: 300; letter-spacing: 3px; line-height: 1.5;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(232, 220, 200, 0.3);
-    border-bottom: 1px solid rgba(232, 220, 200, 0.2); padding-bottom: 20px;
-}
+        .mono-button:hover {
+            background-color: #444;
+            border-color: #ff4757;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+        }
+        
+        .accent-button {
+            background-color: #ff4757;
+            color: #1a1a1a;
+        }
+        .accent-button:hover {
+            background-color: #e63946;
+            border-color: #ff4757;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
+        }
+        
+        /* 캐릭터 선택 그리드 (밀착 배열) */
+        #partnerSelectionGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4개의 이미지를 가로로 밀착 */
+            gap: 0; /* 이미지 간격 제거 */
+        }
+        
+        .partner-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.5s ease-in-out;
+            border-right: 1px solid #333; /* 경계선 추가 */
+        }
+        .partner-card:last-child {
+            border-right: none;
+        }
 
-.subtitle-text {
-    text-align: center; color: #a8a8a8; font-size: 0.95em; margin-bottom: 35px; line-height: 1.8;
-}
-
-.image-selection-container {
-    display: flex; justify-content: space-around; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;
-}
-
-/* 이미지 영역 스타일 */
-.character-image-option {
-    width: 23%; aspect-ratio: 1 / 1.4; 
-    border: 2px solid rgba(101, 85, 68, 0.5); border-radius: 8px;
-    transition: all 0.5s ease; cursor: pointer; position: relative; overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-    /* ❗ 이미지 클릭 유도를 위한 최소 높이 보장 */
-    min-height: 250px; 
-}
-
-.character-image-option img {
-    width: 100%; height: 100%; object-fit: cover;
-    display: block;
-    filter: grayscale(80%) brightness(0.6); 
-    transition: all 0.5s ease;
-}
-
-/* Hover 효과: 스포트라이트 */
-.character-image-option:hover img {
-    filter: grayscale(0%) brightness(1.1);
-}
-.character-image-option:hover {
-    border-color: rgba(232, 220, 200, 0.8); 
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(232, 220, 200, 0.4); 
-    transform: translateY(-8px) scale(1.04);
-}
-
-.character-option-label {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(180deg, transparent 0%, rgba(15, 15, 26, 0.9) 40%); 
-    color: #d8d8d8; font-size: 0.9em;
-    padding: 15px 8px 10px 8px; text-align: center;
-    text-transform: uppercase; font-weight: 500;
-    letter-spacing: 0.5px; transition: all 0.3s ease;
-    z-index: 10;
-}
-
-.starter-button-main { 
-    display: block; width: 70%; margin: 30px auto 15px auto;
-    height: 60px; line-height: 60px;
-    background: linear-gradient(135deg, rgba(70, 60, 50, 0.8) 0%, rgba(55, 45, 35, 0.8) 100%);
-    border: 2px solid rgba(232, 220, 200, 0.5); border-radius: 8px;
-    color: #e8dcc8; font-size: 1.1em; letter-spacing: 1.5px; text-transform: uppercase;
-    transition: all 0.3s ease; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(232, 220, 200, 0.2);
-    text-align: center;
-}
-
-.starter-button-main:hover {
-    background: linear-gradient(135deg, rgba(90, 80, 70, 0.9) 0%, rgba(75, 65, 55, 0.9) 100%);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 30px rgba(232, 220, 200, 0.4);
-    transform: translateY(-4px) scale(1.01);
-}
-
-/* -------------------------------------------
-   B. Iframe 통신용 JS 함수 
-   ------------------------------------------- */
-function selectPartnerAndStart(partnerName, scenarioText) {
-    // 1. EJS 변수 초기화 및 설정 명령어 구성
-    const initVars = [
-        `setvar('Partner_Name', '${partnerName}')`,
-        `setvar('UserCurrentHP', 100)`,
-        `setvar('UserMaxHP', 100)`,
-        `setvar('Aff_Lucifer', 0)`,
-        `setvar('DemonCurrentHP', 100)`,
-        `setvar('CombatActive', 'OFF')`,
-        `setvar('QTE_Active', 'OFF')`,
-        `setvar('Item_Herb', 2)`
-    ];
-    
-    // 2. 최종 실행 명령어: /run (변수 설정) | /gen (스토리 시작)
-    const initCommand = `/run <% ${initVars.join('; ')} %>`;
-    const genCommand = `/gen "${scenarioText.replace(/"/g, '\\"')}"`;
-    const finalCommand = `${initCommand} | ${genCommand}`;
-
-    // 3. window.parent.postMessage를 사용하여 ST 창으로 명령어 전송
-    window.parent.postMessage({
-        type: 'ST_COMMAND',
-        command: finalCommand
-    }, '*'); // 안전하지 않지만, ST 환경에서는 와일드카드 사용
-    
-    // 4. 즉시 화면 전환 및 안내
-    const container = document.querySelector('.selection-container');
-    if(container) {
-        container.innerHTML = `
-            <h3 class="title-header" style="color:#10b981;">COMMAND SENT</h3>
-            <p style="text-align:center; color:#c0c0c0;">파트너 선택이 완료되었습니다.</p>
-            <p style="text-align:center; color:#e8dcc8; margin-top:15px;"><strong>채팅창을 확인하십시오.</strong></p>
-        `;
-        container.style.boxShadow = '0 0 30px #10b981';
-    }
-}
-</script>
+        .partner-image {
+            width: 100%;
+            height: 300px; /* 이미지 높이 고정 */
+            object-fit: cover;
+            transition: all 0.5s ease-in-out;
+            filter: grayscale(100%) brightness(0.6); /* 기본 어둡게 + 흑백 */
+        }
+        
+        .partner-image.active {
+            filter: grayscale(0%) brightness(1); /* 활성화 시 컬러 + 밝게 */
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        /* 이미지 위 텍스트 오버레이 */
+        .overlay-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
 
-<div class="selection-container">
-    <div class="title-header">
-        CHOOSE YOUR PARTNER
-    </div>
-    <p class="subtitle-text">
-        당신의 첫 번째 파트너를 선택하십시오. <br>
-        <strong>클릭 즉시 변수 초기화와 프롤로그가 시작됩니다.</strong>
-    </p>
-    
-    <div class="image-selection-container">
+    <div class="main-container">
         
-        <div class="character-image-option" 
-            style="background-image: url('\characters\partner_priest.jpg');"
-            onclick="selectPartnerAndStart('신부님', '당신은 신부님(쉬움)을 파트너로 선택했습니다. [프롤로그 1: 성스러운 수호와 숨겨진 상흔 시나리오 텍스트]')">
-            <img src="/characters/partner_priest.jpg" alt="신부님">
-            <div class="character-option-label">I. 신부님 (쉬움)</div>
-        </div>
-        
-        <div class="character-image-option" 
-            style="background-image: url('\characters\partner_shaman.jpg');"
-            onclick="selectPartnerAndStart('주술사', '당신은 주술사(보통)를 파트너로 선택했습니다. [프롤로그 2: 도시의 미스터리와 계산된 동맹 시나리오 텍스트]')">
-            <img src="/characters/partner_shaman.jpg" alt="주술사">
-            <div class="character-option-label">II. 주술사 (보통)</div>
-        </div>
-        
-        <div class="character-image-option" 
-            style="background-image: url('\characters\partner_successor.jpg');"
-            onclick="selectPartnerAndStart('후계자', '당신은 후계자(어려움)를 파트너로 선택했습니다. [프롤로그 3: 비효율적인 완벽주의와 오만한 경멸 시나리오 텍스트]')">
-            <img src="/characters/partner_successor.jpg" alt="후계자">
-            <div class="character-option-label">III. 후계자 (어려움)</div>
-        </div>
-        
-        <div class="character-image-option" 
-            style="background-image: url('\characters\partner_cultist.jpg');"
-            onclick="selectPartnerAndStart('숭배자', '당신은 숭배자(매우 어려움)를 파트너로 선택했습니다. [프롤로그 4: 금지된 호출과 눈치 없는 광신 시나리오 텍스트]')">
-            <img src="/characters/partner_cultist.jpg" alt="숭배자">
-            <div class="character-option-label">IV. 숭배자 (매우 어려움)</div>
+        <!-- ============================================== -->
+        <!-- Page 1: 세계관 설명 및 시뮬레이션 시작 (초기 화면) -->
+        <!-- ============================================== -->
+        <div id="page-1" class="page-content space-y-8">
+            <h1 class="header-title">
+                퇴마 시뮬레이션: 그림자의 장
+            </h1>
+            
+            <p class="text-xl font-semibold text-gray-400 mb-6">
+                이단과 신성이 교차하는 세계에서, 당신의 선택이 운명을 결정합니다.
+            </p>
+
+            <!-- 시뮬레이션 설명 -->
+            <div class="p-5 border border-gray-700 rounded-lg bg-[#222] text-left">
+                <h2 class="text-2xl font-bold mb-3 text-red-400">시뮬레이션 가이드</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                    <li>**주제:** 엑소시즘과 퇴마를 배경으로 하는 다크 판타지 로맨스 시뮬레이션입니다.</li>
+                    <li>**특징:** 정화도/오염도 상태창, 턴제 전투 시스템 (QTE 히든 이벤트 포함)이 존재합니다.</li>
+                    <li>**목표:** 4명의 파트너 중 하나를 선택하고, 수많은 비인간계 존재들과 협력 또는 적대하며 미스터리를 해결하세요.</li>
+                </ul>
+            </div>
+
+            <!-- 외부 HTML 링크 버튼 (세계관/캐릭터/설명 페이지) -->
+            <div class="pt-4 space-y-4">
+                <!-- 💡 ST 외부에 연결될 상세 설명 페이지 버튼 -->
+                <button id="externalLinkBtn" class="mono-button w-full">
+                    📘 세계관 / 등장인물 / 상세 규칙 보기 (외부 HTML 연결)
+                </button>
+                
+                <!-- 다음 페이지로 이동 버튼 -->
+                <button id="nextPageBtn" class="accent-button mono-button w-full" onclick="showPage('page-2')">
+                    시작하기: 파트너 캐릭터 선택 →
+                </button>
+            </div>
         </div>
 
-    </div>
-    
-    <div style="text-align: center;">
-        <div class="starter-button-main"
-            onclick="selectPartnerAndStart('랜덤', 'Pause the roleplay. You are the GM. Randomly select one partner from (신부님, 주술사, 후계자, 숭배자) and write the corresponding prologue based on the chosen partner. Do not reveal the partner\\\'s name until the end of the opening dialogue.')">
-            [ V. 운명 주사위 🎲 (랜덤 선택) ]
+        <!-- ============================================== -->
+        <!-- Page 2: 캐릭터 선택 및 WI 토글 -->
+        <!-- ============================================== -->
+        <div id="page-2" class="page-content hidden space-y-4">
+            <h2 class="text-3xl font-bold text-center border-b border-gray-600 pb-3 text-red-400">
+                파트너 선택: 여정을 함께할 조력자를 고르세요
+            </h2>
+            <p class="text-center text-gray-400">
+                이미지에 마우스를 올려 프롤로그를 확인하고 클릭하여 시뮬레이션을 시작하세요.
+            </p>
+            
+            <!-- 1. 캐릭터 이미지 그리드 (가로 밀착) -->
+            <div id="partnerSelectionGrid">
+                <!-- 여기에 캐릭터 버튼이 동적으로 삽입됩니다. -->
+            </div>
+
+            <!-- 2. 프롤로그 미리보기 (이미지 아래에 표시) -->
+            <div id="prologuePreview" class="p-4 bg-[#282828] border border-gray-600 rounded-lg text-left hidden">
+                <h3 class="font-bold text-lg text-yellow-400 mb-2">프롤로그 스크립트 미리보기:</h3>
+                <p id="prologueText" class="text-sm italic text-gray-300"></p>
+            </div>
+            
+            <!-- 3. WI 토글 및 뒤로가기 버튼 -->
+            <div class="pt-6 border-t border-gray-700 space-y-4">
+                 <button id="toggleWICancelBtn" class="mono-button w-full" onclick="showPage('page-1')">
+                    ← 초기 화면으로 돌아가기
+                </button>
+
+                <!-- 비인간계 캐릭터 WI 토글 영역 -->
+                <button id="toggleWIListBtn" class="mono-button w-full mt-4">
+                    👥 비인간계 캐릭터 WI 토글 설정 및 사용자 정의 (선택 사항)
+                </button>
+                <div id="wiToggleArea" class="hidden p-4 mt-2 bg-[#282828] border border-gray-700 rounded-lg grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- 여기에 WI 토글 체크박스가 삽입됩니다. -->
+                    <div class="md:col-span-3 text-sm text-yellow-500 border-b border-gray-600 pb-2 mb-2">
+                        **[개발 가이드: 캐릭터 유동성]**
+                        <ul class="list-disc list-inside ml-4 mt-2 text-xs text-gray-400 space-y-1">
+                            <li>**캐릭터 추가:** 새로운 비인간계 캐릭터를 추가하려면, 이 HTML 파일 내의 `NON_PARTNER_CHARS` 배열에 `{ id: '새ID', name: '새이름', type: '새타입' }` 형식으로 객체를 추가하고 `renderWIToggleArea()` 함수를 다시 실행해주세요.</li>
+                            <li>**ST 연동:** 추가된 캐릭터의 WI 파일은 **ST의 WI 폴더**에 있어야 하며, 이 체크박스 ID(`id: '새ID'`)와 ST의 WI 파일 이름(확장자 제외)이 **정확히 일치**해야 `/run set_wits` 명령어로 활성화됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="description">
-        * 이미지 또는 버튼 클릭 즉시 게임이 시작됩니다.
-    </div>
-</div>
+
+    <script>
+        // --- 전역 데이터 및 기능 설정 ---
+        
+        // 파트너 캐릭터 정보 (임시 데이터)
+        const PARTNER_CHARS = [
+            { id: 'priest', name: '요한 신부', type: '천주교 사제', image: 'https://placehold.co/400x400/1a1a1a/e0e0e0?text=Priest' , prologue: "어둠 속에서 속죄를 구하는 한 남자의 이야기. 그의 임무는 타락한 영혼들을 구원하는 것입니다. 그러나 당신이 나타나면서 그의 믿음은 시험대에 오릅니다..."},
+            { id: 'shaman', name: '샤카 주술사', type: '힌두 신비주의자', image: 'https://placehold.co/400x400/1a1a1a/e0e0e0?text=Shaman' , prologue: "신성한 불꽃과 주술적 힘으로 악을 몰아내는 주술사. 강렬한 카리스마 뒤에 숨겨진 그의 과거와 비밀스러운 의식을 함께하게 됩니다."},
+            { id: 'exorcist', name: '현대 퇴마사', type: '동양계 퇴마 전문가', image: 'https://placehold.co/400x400/1a1a1a/e0e0e0?text=Exorcist' , prologue: "빠른 판단력과 현대 기술을 사용하는 냉철한 퇴마사. 동양의 영물들과 얽힌 미스터리한 사건을 해결하기 위해 당신과 계약을 맺습니다."},
+            { id: 'cultist', name: '아마추어 숭배자', type: '악마 숭배자 (초보)', image: 'https://placehold.co/400x400/1a1a1a/e0e0e0?text=Cultist' , prologue: "악마를 소환하려다 실수로 당신을 만난 아마추어 숭배자. 위험하지만 매혹적인 그의 길에 동참하여 금단의 지식을 탐구하게 됩니다."},
+        ];
+
+        // 비인간계 캐릭터 정보 (WI 토글용 임시 데이터)
+        // 🚨 유동적인 캐릭터 추가를 위해 이 배열에 새 객체를 추가하세요.
+        const NON_PARTNER_CHARS = [
+            { id: 'michael', name: '미카엘', type: '천사' }, { id: 'uriel', name: '우리엘', type: '천사' }, 
+            { id: 'lucifer', name: '루시퍼', type: '타천사' }, { id: 'mephisto', name: '메피스토', type: '악마' },
+            { id: 'astaroth', name: '아스타로트', type: '악마' }, { id: 'vishnu', name: '비슈누', type: '힌두신' }, 
+            { id: 'agni', name: '아그니', type: '힌두신' }, { id: 'chouno', name: '천호', type: '동양영물' }, 
+            { id: 'kirin', name: '기린', type: '환수' }, { id: 'extra1', name: '이단자', type: '악마' },
+        ];
+        
+        // 현재 활성화된 WI 목록 (SillyTavern에서 WI를 토글하는 것을 시뮬레이션)
+        let activeWIs = []; 
+
+        /**
+         * 화면을 전환합니다.
+         * @param {string} pageId - 표시할 페이지의 ID ('page-1', 'page-2')
+         */
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+
+            if (pageId === 'page-2') {
+                renderPartnerSelection();
+            }
+        }
+        
+        /**
+         * 파트너 선택 페이지를 동적으로 렌더링하고 이벤트 리스너를 추가합니다.
+         */
+        function renderPartnerSelection() {
+            const grid = document.getElementById('partnerSelectionGrid');
+            const previewBox = document.getElementById('prologuePreview');
+            const previewText = document.getElementById('prologueText');
+
+            grid.innerHTML = PARTNER_CHARS.map(char => `
+                <div 
+                    class="partner-card"
+                    data-id="${char.id}"
+                >
+                    <img src="${char.image}" alt="${char.name} 이미지" 
+                         class="partner-image" data-id="${char.id}">
+                    
+                    <div class="overlay-text">
+                        <span class="text-xl font-bold text-white">${char.name}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // WI 토글 영역 렌더링
+            renderWIToggleArea();
+            
+            // 이벤트 리스너 부착
+            document.querySelectorAll('.partner-card').forEach(card => {
+                const charId = card.dataset.id;
+                const char = PARTNER_CHARS.find(c => c.id === charId);
+
+                // 1. Hover 효과
+                card.addEventListener('mouseenter', () => {
+                    // 프롤로그 박스 표시
+                    previewText.textContent = char.prologue;
+                    previewBox.classList.remove('hidden');
+
+                    // 다른 카드 어둡게 처리 및 현재 카드 강조
+                    document.querySelectorAll('.partner-image').forEach(img => {
+                        img.classList.remove('active');
+                    });
+                    card.querySelector('.partner-image').classList.add('active');
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    // 마우스가 그리드에서 벗어났을 때만 숨기기 (또는 프롤로그 박스 자체에서 벗어났을 때)
+                    // 현재는 이미지에서 벗어나면 바로 비활성화
+                    // previewBox.classList.add('hidden'); // 일단 숨김 처리하지 않고 마우스를 뗄 때까지 유지
+                });
+                
+                // 그리드 전체에서 마우스가 벗어날 때 미리보기 숨기기
+                grid.addEventListener('mouseleave', () => {
+                    previewBox.classList.add('hidden');
+                    document.querySelectorAll('.partner-image').forEach(img => {
+                        img.classList.remove('active');
+                    });
+                });
+
+
+                // 2. Click 이벤트 (ST 초기화 및 시작)
+                card.addEventListener('click', () => {
+                    startGame(charId);
+                });
+            });
+        }
+        
+        /**
+         * WI 토글 영역을 렌더링하고 이벤트를 처리합니다.
+         * 🚨 캐릭터 추가 시, NON_PARTNER_CHARS 배열만 수정하면 됩니다.
+         */
+        function renderWIToggleArea() {
+            const wiArea = document.getElementById('wiToggleArea');
+            // 기존 튜토리얼 영역을 유지하고 그 아래에 체크박스 추가
+            const tutorialGuide = wiArea.querySelector('.md\\:col-span-3');
+            let checkboxesHtml = '';
+
+            NON_PARTNER_CHARS.forEach(char => {
+                checkboxesHtml += `
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="wi-${char.id}" data-id="${char.id}" 
+                               class="form-checkbox h-4 w-4 text-red-500 rounded border-gray-500 bg-gray-700"
+                               ${activeWIs.includes(char.id) ? 'checked' : ''}>
+                        <label for="wi-${char.id}" class="text-sm text-gray-300">${char.name} (${char.type})</label>
+                    </div>
+                `;
+            });
+            
+            // 튜토리얼 가이드를 제외한 영역을 업데이트
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = "grid grid-cols-2 md:grid-cols-3 gap-3";
+            checkboxContainer.innerHTML = checkboxesHtml;
+            
+            // 기존 내용 제거 후 튜토리얼 가이드와 체크박스 컨테이너 다시 삽입
+            wiArea.innerHTML = '';
+            wiArea.appendChild(tutorialGuide);
+            wiArea.appendChild(checkboxContainer);
+
+            
+            // WI 토글 버튼 이벤트
+            document.getElementById('toggleWIListBtn').addEventListener('click', () => {
+                wiArea.classList.toggle('hidden');
+            });
+
+            // 체크박스 변경 이벤트 -> activeWIs 업데이트
+            wiArea.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const charId = e.target.dataset.id;
+                    if (e.target.checked) {
+                        if (!activeWIs.includes(charId)) activeWIs.push(charId);
+                    } else {
+                        activeWIs = activeWIs.filter(id => id !== charId);
+                    }
+                    console.log("현재 활성화된 WI ID:", activeWIs);
+                });
+            });
+        }
+
+        /**
+         * 게임 시작 로직 (ST 연동의 핵심)
+         * @param {string} partnerId - 선택된 파트너 ID
+         */
+        function startGame(partnerId) {
+            const partner = PARTNER_CHARS.find(c => c.id === partnerId);
+            
+            if (!confirm(`${partner.name}(와)과 함께 여정을 시작하시겠습니까? (ST 상태 초기화 및 채팅 시작)`)) {
+                return;
+            }
+
+            // ====================================================================
+            // SillyTavern 연동 핵심 부분 (JS Slash Runner 사용)
+            // ST에서 JS Slash Runner 확장 프로그램이 활성화되어 있어야 합니다.
+            // ====================================================================
+            
+            // 1. 활성화할 WI 목록 생성 (파트너 WI는 포함하지 않음. ST가 알아서 처리)
+            const activeWitsString = activeWIs.join(',');
+
+            // 2. ST 상태 초기화 및 프롬프트 전송 명령어 생성
+            // 🚨 중요: ST 내부 상태 초기화와 시나리오 선택을 유도하는 명령어
+            // /run set_char: 선택된 파트너 캐릭터로 전환
+            // /run set_wits: 비인간계 WI 목록 활성화 (선택 사항)
+            // /next_response: ST의 다음 응답 유도 (채팅 시작)
+            const initialPrompt = `당신은 ${partner.name}와(과) 함께 퇴마 임무를 시작했습니다. 프롤로그: "${partner.prologue}"에 이어서 자연스럽게 첫 대사를 시작하세요. 당신의 캐릭터는 당신이 선택한 파트너와 함께 현장에 있습니다. 이 세션은 이제 시스템 기반 프롬프팅으로 진행되며, 모든 게임 기능(HP, 정화도/오염도, 턴제, QTE 등)을 추후 AI 응답에 맞춰 활성화할 예정입니다.`;
+            
+            // ST의 JS Slash Runner를 통해 실행할 최종 명령어 (한 줄)
+            const slashCommand = `/run set_char ${partnerId}; /run set_wits ${activeWitsString}; /next_response ${initialPrompt}`;
+            
+            alert(`
+                ✅ 시뮬레이션 설정 완료 및 ST 응답 요청!
+                
+                파트너: ${partner.name}
+                활성 WI: ${activeWitsString || '없음'}
+                
+                [다음 단계]
+                1. 이 알림을 닫고 ST 채팅창으로 돌아가세요.
+                2. ST 채팅창에 아래 명령어를 입력 (또는 JS Slash Runner로 실행)하여 채팅을 시작하세요.
+                
+                **ST 실행 명령어:** ${slashCommand}
+            `);
+
+            // 페이지를 다시 초기 화면으로 되돌립니다.
+            showPage('page-1'); 
+        }
+
+        // 초기 시작
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('page-1');
+            
+            // 외부 링크 버튼 이벤트 (새 창 시뮬레이션)
+            document.getElementById('externalLinkBtn').addEventListener('click', () => {
+                alert("이 버튼은 외부 HTML 문서(세계관, 캐릭터 상세 설명, 상세 규칙)를 새 창으로 여는 기능입니다. 실제로는 이 페이지를 ST 외부에서 호스팅해야 합니다.");
+                // window.open('worldview.html', '_blank'); // 실제 구현 시 사용
+            });
+        });
+
+    </script>
 </body>
 </html>
