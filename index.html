@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>엑소시즘 시뮬레이션: 파트너 선택</title>
+    <style>
+/* -------------------------------------------
+   A. 모노톤 오컬트 스타일 (CSS) 
+   ------------------------------------------- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Georgia', 'Malgun Gothic', serif; }
+
+body {
+    /* ST의 iframe 배경색과 유사하게 투명하게 설정 */
+    background: transparent; 
+    color: #d8d8d8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.selection-container {
+    width: 90%; max-width: 900px; margin: 25px auto; padding: 40px;
+    /* 짙은 네이비 배경, 오컬트 무드 */
+    background: linear-gradient(135deg, rgba(15, 15, 26, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
+    border: 2px solid rgba(101, 85, 68, 0.6); border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(240, 230, 140, 0.05), 0 0 60px rgba(101, 85, 68, 0.2);
+    animation: fadeIn 1s ease-out; /* 로드 시 페이드인 */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.title-header {
+    color: #e8dcc8; text-align: center; margin-bottom: 15px;
+    font-size: 2.5em; font-weight: 300; letter-spacing: 3px; line-height: 1.5;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(232, 220, 200, 0.3);
+    border-bottom: 1px solid rgba(232, 220, 200, 0.2); padding-bottom: 20px;
+}
+
+.subtitle-text {
+    text-align: center; color: #a8a8a8; font-size: 0.95em; margin-bottom: 35px; line-height: 1.8;
+}
+
+.image-selection-container {
+    display: flex; justify-content: space-around; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;
+}
+
+/* 이미지 영역 스타일 */
+.character-image-option {
+    width: 23%; aspect-ratio: 1 / 1.4; 
+    border: 2px solid rgba(101, 85, 68, 0.5); border-radius: 8px;
+    transition: all 0.5s ease; cursor: pointer; position: relative; overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    /* ❗ 이미지 클릭 유도를 위한 최소 높이 보장 */
+    min-height: 250px; 
+}
+
+.character-image-option img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+    filter: grayscale(80%) brightness(0.6); 
+    transition: all 0.5s ease;
+}
+
+/* Hover 효과: 스포트라이트 */
+.character-image-option:hover img {
+    filter: grayscale(0%) brightness(1.1);
+}
+.character-image-option:hover {
+    border-color: rgba(232, 220, 200, 0.8); 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(232, 220, 200, 0.4); 
+    transform: translateY(-8px) scale(1.04);
+}
+
+.character-option-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(15, 15, 26, 0.9) 40%); 
+    color: #d8d8d8; font-size: 0.9em;
+    padding: 15px 8px 10px 8px; text-align: center;
+    text-transform: uppercase; font-weight: 500;
+    letter-spacing: 0.5px; transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.starter-button-main { 
+    display: block; width: 70%; margin: 30px auto 15px auto;
+    height: 60px; line-height: 60px;
+    background: linear-gradient(135deg, rgba(70, 60, 50, 0.8) 0%, rgba(55, 45, 35, 0.8) 100%);
+    border: 2px solid rgba(232, 220, 200, 0.5); border-radius: 8px;
+    color: #e8dcc8; font-size: 1.1em; letter-spacing: 1.5px; text-transform: uppercase;
+    transition: all 0.3s ease; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(232, 220, 200, 0.2);
+    text-align: center;
+}
+
+.starter-button-main:hover {
+    background: linear-gradient(135deg, rgba(90, 80, 70, 0.9) 0%, rgba(75, 65, 55, 0.9) 100%);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 30px rgba(232, 220, 200, 0.4);
+    transform: translateY(-4px) scale(1.01);
+}
+
+/* -------------------------------------------
+   B. Iframe 통신용 JS 함수 
+   ------------------------------------------- */
+function selectPartnerAndStart(partnerName, scenarioText) {
+    // 1. EJS 변수 초기화 및 설정 명령어 구성
+    const initVars = [
+        `setvar('Partner_Name', '${partnerName}')`,
+        `setvar('UserCurrentHP', 100)`,
+        `setvar('UserMaxHP', 100)`,
+        `setvar('Aff_Lucifer', 0)`,
+        `setvar('DemonCurrentHP', 100)`,
+        `setvar('CombatActive', 'OFF')`,
+        `setvar('QTE_Active', 'OFF')`,
+        `setvar('Item_Herb', 2)`
+    ];
+    
+    // 2. 최종 실행 명령어: /run (변수 설정) | /gen (스토리 시작)
+    const initCommand = `/run <% ${initVars.join('; ')} %>`;
+    const genCommand = `/gen "${scenarioText.replace(/"/g, '\\"')}"`;
+    const finalCommand = `${initCommand} | ${genCommand}`;
+
+    // 3. window.parent.postMessage를 사용하여 ST 창으로 명령어 전송
+    window.parent.postMessage({
+        type: 'ST_COMMAND',
+        command: finalCommand
+    }, '*'); // 안전하지 않지만, ST 환경에서는 와일드카드 사용
+    
+    // 4. 즉시 화면 전환 및 안내
+    const container = document.querySelector('.selection-container');
+    if(container) {
+        container.innerHTML = `
+            <h3 class="title-header" style="color:#10b981;">COMMAND SENT</h3>
+            <p style="text-align:center; color:#c0c0c0;">파트너 선택이 완료되었습니다.</p>
+            <p style="text-align:center; color:#e8dcc8; margin-top:15px;"><strong>채팅창을 확인하십시오.</strong></p>
+        `;
+        container.style.boxShadow = '0 0 30px #10b981';
+    }
+}
+</script>
+</head>
+<body>
+
+<div class="selection-container">
+    <div class="title-header">
+        CHOOSE YOUR PARTNER
+    </div>
+    <p class="subtitle-text">
+        당신의 첫 번째 파트너를 선택하십시오. <br>
+        <strong>클릭 즉시 변수 초기화와 프롤로그가 시작됩니다.</strong>
+    </p>
+    
+    <div class="image-selection-container">
+        
+        <div class="character-image-option" 
+            style="background-image: url('\characters\partner_priest.jpg');"
+            onclick="selectPartnerAndStart('신부님', '당신은 신부님(쉬움)을 파트너로 선택했습니다. [프롤로그 1: 성스러운 수호와 숨겨진 상흔 시나리오 텍스트]')">
+            <img src="/characters/partner_priest.jpg" alt="신부님">
+            <div class="character-option-label">I. 신부님 (쉬움)</div>
+        </div>
+        
+        <div class="character-image-option" 
+            style="background-image: url('\characters\partner_shaman.jpg');"
+            onclick="selectPartnerAndStart('주술사', '당신은 주술사(보통)를 파트너로 선택했습니다. [프롤로그 2: 도시의 미스터리와 계산된 동맹 시나리오 텍스트]')">
+            <img src="/characters/partner_shaman.jpg" alt="주술사">
+            <div class="character-option-label">II. 주술사 (보통)</div>
+        </div>
+        
+        <div class="character-image-option" 
+            style="background-image: url('\characters\partner_successor.jpg');"
+            onclick="selectPartnerAndStart('후계자', '당신은 후계자(어려움)를 파트너로 선택했습니다. [프롤로그 3: 비효율적인 완벽주의와 오만한 경멸 시나리오 텍스트]')">
+            <img src="/characters/partner_successor.jpg" alt="후계자">
+            <div class="character-option-label">III. 후계자 (어려움)</div>
+        </div>
+        
+        <div class="character-image-option" 
+            style="background-image: url('\characters\partner_cultist.jpg');"
+            onclick="selectPartnerAndStart('숭배자', '당신은 숭배자(매우 어려움)를 파트너로 선택했습니다. [프롤로그 4: 금지된 호출과 눈치 없는 광신 시나리오 텍스트]')">
+            <img src="/characters/partner_cultist.jpg" alt="숭배자">
+            <div class="character-option-label">IV. 숭배자 (매우 어려움)</div>
+        </div>
+
+    </div>
+    
+    <div style="text-align: center;">
+        <div class="starter-button-main"
+            onclick="selectPartnerAndStart('랜덤', 'Pause the roleplay. You are the GM. Randomly select one partner from (신부님, 주술사, 후계자, 숭배자) and write the corresponding prologue based on the chosen partner. Do not reveal the partner\\\'s name until the end of the opening dialogue.')">
+            [ V. 운명 주사위 🎲 (랜덤 선택) ]
+        </div>
+    </div>
+    
+    <div class="description">
+        * 이미지 또는 버튼 클릭 즉시 게임이 시작됩니다.
+    </div>
+</div>
+</body>
+</html>
