@@ -55,7 +55,7 @@
          font-family: 'EutmanGungseo', sans-serif;
          font-size: 3.5rem;
          font-weight: normal;
-         letter-spacing: 0.10em;
+         letter-spacing: 0.15em;
          color: var(--color-primary);
          text-shadow: 0 0 15px rgba(218, 165, 32, 0.6);
          margin-top: 1rem;
@@ -271,10 +271,102 @@
             </button>
          </div>
       </div>
+
+      <!-- ============================================== -->
+      <!-- Page 5: 시뮬레이션 플레이 UI (Game Status) -->
+      <!-- 이 페이지는 ST 응답 후 자동으로 활성화됩니다. -->
+      <!-- ============================================== -->
+      <div id="p5" class="hidden text-left space-y-6">
+         <h2 class="text-3xl font-bold pb-3 border-b border-gray-600 text-yellow-400"
+             data-ko="시뮬레이션 상태창" data-en="Simulation Status Dashboard"></h2>
+
+         <div class="grid grid-cols-3 gap-4 text-sm font-sans">
+            <!-- 날짜 및 시간 -->
+            <div class="col-span-1 p-3 bg-black/40 rounded-lg border border-gray-700">
+               <p class="font-bold text-yellow-500" data-ko="날짜/시간" data-en="Date/Time"></p>
+               <p id="game_date" class="text-white">Day 1</p>
+            </div>
+            <!-- 턴 상태 -->
+            <div class="col-span-1 p-3 bg-black/40 rounded-lg border border-gray-700">
+               <p class="font-bold text-yellow-500" data-ko="턴 상태" data-en="Turn Status"></p>
+               <p id="turn_status" class="text-red-400 font-bold" data-ko="대기 중" data-en="Awaiting Command"></p>
+            </div>
+            <!-- 아이템/소모품 -->
+            <div class="col-span-1 p-3 bg-black/40 rounded-lg border border-gray-700">
+               <p class="font-bold text-yellow-500" data-ko="아이템 (슬롯)" data-en="Inventory (Slots)"></p>
+               <p id="item_slots" class="text-gray-300">3 / 5</p>
+            </div>
+         </div>
+
+         <!-- 상태 바 (HP, 정화도, 오염도) -->
+         <div class="space-y-4">
+            <!-- HP -->
+            <div>
+               <div class="flex justify-between font-bold">
+                  <span data-ko="HP" data-en="Health (HP)">HP</span>
+                  <span id="hp_value">100 / 100</span>
+               </div>
+               <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                  <div id="hp_bar" class="bg-red-500 h-full transition-all duration-500" style="width: 100%;"></div>
+               </div>
+            </div>
+
+            <!-- 정화도 (Purity) -->
+            <div>
+               <div class="flex justify-between font-bold">
+                  <span data-ko="정화도" data-en="Purity">정화도</span>
+                  <span id="purity_value">50 / 100</span>
+               </div>
+               <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                  <div id="purity_bar" class="bg-blue-400 h-full transition-all duration-500" style="width: 50%;"></div>
+               </div>
+            </div>
+
+            <!-- 오염도 (Contamination) -->
+            <div>
+               <div class="flex justify-between font-bold">
+                  <span data-ko="오염도" data-en="Contamination">오염도</span>
+                  <span id="contam_value">0 / 100</span>
+               </div>
+               <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
+                  <div id="contam_bar" class="bg-purple-600 h-full transition-all duration-500" style="width: 0%;"></div>
+               </div>
+            </div>
+         </div>
+
+         <!-- QTE 팝업 컨테이너 (초기에는 숨김) -->
+         <div id="qte_popup" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div class="bg-gray-900 p-8 rounded-lg border-4 border-red-500 text-center space-y-4 max-w-lg w-full">
+               <h3 id="qte_title" class="text-3xl font-bold text-red-500 font-display" data-ko="긴급 QTE 발동!" data-en="Emergency QTE Triggered!"></h3>
+               <p id="qte_prompt" class="text-xl text-yellow-300 font-mono"></p>
+               <input type="text" id="qte_input" class="w-full p-3 bg-gray-700 text-white rounded text-center text-lg font-mono placeholder-gray-400"
+                      data-ko-ph="여기에 구절을 빠르게 입력하세요..." data-en-ph="Type the holy verse quickly here..." autofocus>
+               <p id="qte_timer" class="text-lg text-white font-bold"></p>
+               <div id="qte_feedback" class="text-xl font-bold mt-2"></div>
+            </div>
+         </div>
+
+         <!-- 임시 버튼: ST로 돌아가기 -->
+         <div class="pt-6 border-t border-gray-700">
+            <button onclick="alert('ST 채팅창에서 대화를 이어가세요.')" class="mono-button accent-button w-full" data-ko="대화로 돌아가기" data-en="Return to Chat">대화로 돌아가기</button>
+         </div>
+      </div>
    </div>
 
    <script>
 // --- 전역 데이터 및 상태 ---
+
+// 게임 상태 변수
+var gameState = {
+    hp: 100, maxHp: 100,
+    purity: 50, maxPurity: 100,
+    contam: 0, maxContam: 100,
+    day: 1, time: 'Day', // Day 1
+    turnActive: false,
+    inventory: 3, maxInventory: 5,
+    qteActive: false,
+};
+
 var chars = [
     {id:'priest', name:'요한 신부', type:'사제', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Priest', text:'어둠 속에서 속죄를 구하는 한 남자의 이야기. 고대 유물의 저주를 풀기 위해 폐허가 된 수도원으로 향하며 당신과의 만남이 시작된다.'},
     {id:'shaman', name:'샤카 주술사', type:'주술사', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Shaman', text:'신성한 불꽃으로 악을 멸하는 주술사. 미지의 전염병에 걸린 마을을 구하기 위한 여정에서, 당신은 그의 강력한 조력자가 된다.'},
@@ -310,6 +402,76 @@ var translations = {
 };
 
 // --- 기능 로직 ---
+// [NEW] 게임 상태 업데이트 로직 (HP, 정화도, 오염도)
+function updateGameStatus(type, value) {
+    value = parseInt(value);
+    if (isNaN(value)) return;
+
+    var barId, valueId, maxVal;
+    
+    if (type === 'hp') {
+        gameState.hp = Math.min(gameState.maxHp, Math.max(0, gameState.hp + value));
+        barId = 'hp_bar'; valueId = 'hp_value'; maxVal = gameState.maxHp;
+    } else if (type === 'purity') {
+        gameState.purity = Math.min(gameState.maxPurity, Math.max(0, gameState.purity + value));
+        barId = 'purity_bar'; valueId = 'purity_value'; maxVal = gameState.maxPurity;
+    } else if (type === 'contam') {
+        gameState.contam = Math.min(gameState.maxContam, Math.max(0, gameState.contam + value));
+        barId = 'contam_bar'; valueId = 'contam_value'; maxVal = gameState.maxContam;
+    } else {
+        return;
+    }
+
+    var percentage = (gameState[type] / maxVal) * 100;
+    document.getElementById(barId).style.width = percentage + '%';
+    document.getElementById(valueId).innerText = gameState[type] + ' / ' + maxVal;
+    
+    console.log(`[STATUS UPDATED] ${type}: ${gameState[type]}`);
+}
+
+// [NEW] 날짜 및 시간 업데이트
+function updateDateTime(days, time) {
+    gameState.day = parseInt(days);
+    gameState.time = time;
+    document.getElementById('game_date').innerText = `Day ${gameState.day}, ${gameState.time}`;
+    console.log(`[TIME UPDATED] Day ${gameState.day}, ${gameState.time}`);
+}
+
+// [NEW] 턴제 시스템 활성화/비활성화
+function toggleTurnSystem(activeStatus) {
+    var statusEl = document.getElementById('turn_status');
+    var isActive = activeStatus === 'START';
+    gameState.turnActive = isActive;
+
+    if (isActive) {
+        statusEl.innerText = (currentLang === 'ko' ? "턴 활성화: 당신의 턴" : "Turn Active: Your Turn");
+        statusEl.classList.remove('text-red-400');
+        statusEl.classList.add('text-green-400');
+    } else {
+        statusEl.innerText = (currentLang === 'ko' ? "대기 중" : "Awaiting Command");
+        statusEl.classList.remove('text-green-400');
+        statusEl.classList.add('text-red-400');
+    }
+    console.log(`[TURN SYSTEM] ${activeStatus}`);
+}
+
+// [NEW] QTE 이벤트 핸들러 (로직은 Step 5에서 완성)
+function handleQTE(type, prompt) {
+    if (gameState.qteActive) return; // 이미 QTE 중이면 무시
+    gameState.qteActive = true;
+    
+    var popup = document.getElementById('qte_popup');
+    var inputEl = document.getElementById('qte_input');
+    
+    popup.classList.remove('hidden');
+    document.getElementById('qte_prompt').innerText = prompt;
+    
+    inputEl.value = '';
+    inputEl.focus(); // 입력 필드에 포커스
+
+    // [Step 5에서 QTE의 타이머 및 입력 로직이 완성됩니다]
+    console.log(`[QTE TRIGGERED] Type: ${type}, Prompt: ${prompt}`);
+}
 
 function go(id) {
     document.querySelectorAll('div[id^="p"]').forEach(function(d) { d.classList.add('hidden'); });
@@ -535,8 +697,7 @@ document.getElementById('btnStart').onclick = function() {
 
     alert("ST 실행 명령어 (복사됨):\n" + cmd);
 
-    go('p1');
-    state = { wis: [], pid: null, scType: 'none', scText: '', currentPage: 'p1' }; // 상태 초기화
+    go('p5');
 };
 
 // --- 초기화 및 이벤트 리스너 ---
