@@ -7,7 +7,7 @@
    <!-- Tailwind CSS CDN -->
    <script src="https://cdn.tailwindcss.com"></script>
    <style>
-      /* [1. 폰트 적용] 제공해주신 EutmanGungseo 폰트 통합 */
+      /* 폰트: 제목용 EutmanGungseo 및 Playfair Display */
       @font-face {
          font-family: 'EutmanGungseo';
          src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKGUNG.woff2') format('woff2');
@@ -15,16 +15,14 @@
          font-display: swap;
       }
 
-      /* 폰트: 여성향 고딕 스타일 Playfair Display (일반 텍스트) */
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
-      /* 네이비/골드 Gothic 스타일 적용 */
       :root {
          --color-bg: #0D0D1A;
          --color-surface: #1B1B2A;
          --color-primary: #DAA520; /* Goldenrod */
          --color-text: #E0E0E0;
-         --color-accent: #4B0082; /* Deep Indigo for secondary accent */
+         --color-accent: #4B0082; /* Deep Indigo */
       }
 
       body {
@@ -51,7 +49,6 @@
       }
 
       .header-title {
-         /* [1. 폰트 적용] 제목에 EutmanGungseo 적용 */
          font-family: 'EutmanGungseo', sans-serif;
          font-size: 3.5rem;
          font-weight: normal;
@@ -61,7 +58,6 @@
          margin-top: 1rem;
       }
 
-      /* 버튼 및 기타 스타일은 이전과 동일하게 유지 */
       .mono-button {
          padding: 0.75rem 2rem;
          border-radius: 4px;
@@ -85,11 +81,6 @@
          border-color: var(--color-primary);
       }
 
-         .accent-button:hover {
-            background-color: #e5b000;
-            box-shadow: 0 0 15px rgba(218, 165, 32, 0.8);
-         }
-
          .accent-button:disabled {
             background-color: #555;
             color: #888;
@@ -99,7 +90,6 @@
             transform: none;
          }
 
-      /* 카드 및 이미지 스타일 */
       .card {
          background: #28283a;
          border: 3px solid transparent;
@@ -147,6 +137,31 @@
          padding: 5px;
          text-align: center;
          font-size: 0.8rem;
+      }
+
+      /* QTE 스타일 */
+      #qte_popup {
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: 0;
+         background-color: rgba(0, 0, 0, 0.9);
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         z-index: 9999;
+      }
+
+         #qte_popup > div {
+            background-color: var(--color-surface);
+            border: 4px solid var(--color-primary);
+            box-shadow: 0 0 25px rgba(218, 165, 32, 0.8);
+         }
+
+      #qte_input {
+         font-family: monospace;
+         border: 2px solid var(--color-primary);
       }
 
       .hidden {
@@ -274,12 +289,13 @@
 
       <!-- ============================================== -->
       <!-- Page 5: 시뮬레이션 플레이 UI (Game Status) -->
-      <!-- 이 페이지는 ST 응답 후 자동으로 활성화됩니다. -->
+      <!-- 이 코드를 Page 4 블록 바로 뒤에 붙여넣으세요 -->
       <!-- ============================================== -->
       <div id="p5" class="hidden text-left space-y-6">
          <h2 class="text-3xl font-bold pb-3 border-b border-gray-600 text-yellow-400"
              data-ko="시뮬레이션 상태창" data-en="Simulation Status Dashboard"></h2>
 
+         <!-- 상단 정보 그리드 -->
          <div class="grid grid-cols-3 gap-4 text-sm font-sans">
             <!-- 날짜 및 시간 -->
             <div class="col-span-1 p-3 bg-black/40 rounded-lg border border-gray-700">
@@ -336,37 +352,28 @@
 
          <!-- QTE 팝업 컨테이너 (초기에는 숨김) -->
          <div id="qte_popup" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-gray-900 p-8 rounded-lg border-4 border-red-500 text-center space-y-4 max-w-lg w-full">
-               <h3 id="qte_title" class="text-3xl font-bold text-red-500 font-display" data-ko="긴급 QTE 발동!" data-en="Emergency QTE Triggered!"></h3>
+            <div class="bg-gray-900 p-8 rounded-lg border-4 border-yellow-500 text-center space-y-4 max-w-lg w-full">
+               <h3 id="qte_title" class="text-3xl font-bold text-yellow-500 font-display" data-ko="긴급 QTE 발동!" data-en="Emergency QTE Triggered!"></h3>
                <p id="qte_prompt" class="text-xl text-yellow-300 font-mono"></p>
+
+               <!-- 타이핑 입력창 -->
                <input type="text" id="qte_input" class="w-full p-3 bg-gray-700 text-white rounded text-center text-lg font-mono placeholder-gray-400"
                       data-ko-ph="여기에 구절을 빠르게 입력하세요..." data-en-ph="Type the holy verse quickly here..." autofocus>
+
+               <!-- 타이머 및 결과 피드백 -->
                <p id="qte_timer" class="text-lg text-white font-bold"></p>
                <div id="qte_feedback" class="text-xl font-bold mt-2"></div>
             </div>
          </div>
 
-         <!-- 임시 버튼: ST로 돌아가기 -->
+         <!-- 임시 버튼: ST로 돌아가기 (안내용) -->
          <div class="pt-6 border-t border-gray-700">
-            <button onclick="alert('ST 채팅창에서 대화를 이어가세요.')" class="mono-button accent-button w-full" data-ko="대화로 돌아가기" data-en="Return to Chat">대화로 돌아가기</button>
+            <button onclick="alert('ST 채팅창에서 대화를 이어가세요. UI는 열어두셔도 됩니다.')" class="mono-button accent-button w-full" data-ko="대화로 돌아가기 (창 유지)" data-en="Return to Chat (Keep Open)">대화로 돌아가기 (창 유지)</button>
          </div>
       </div>
-   </div>
 
-   <script>
+<script>
 // --- 전역 데이터 및 상태 ---
-
-// 게임 상태 변수
-var gameState = {
-    hp: 100, maxHp: 100,
-    purity: 50, maxPurity: 100,
-    contam: 0, maxContam: 100,
-    day: 1, time: 'Day', // Day 1
-    turnActive: false,
-    inventory: 3, maxInventory: 5,
-    qteActive: false,
-};
-
 var chars = [
     {id:'priest', name:'요한 신부', type:'사제', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Priest', text:'어둠 속에서 속죄를 구하는 한 남자의 이야기. 고대 유물의 저주를 풀기 위해 폐허가 된 수도원으로 향하며 당신과의 만남이 시작된다.'},
     {id:'shaman', name:'샤카 주술사', type:'주술사', isP:true, img:'https://placehold.co/180x270/1a1a1a/e0e0e0?text=Shaman', text:'신성한 불꽃으로 악을 멸하는 주술사. 미지의 전염병에 걸린 마을을 구하기 위한 여정에서, 당신은 그의 강력한 조력자가 된다.'},
@@ -388,10 +395,22 @@ var chars = [
 var state = { wis: [], pid: null, scType: 'none', scText: '', currentPage: 'p1' };
 var currentLang = 'ko';
 
+// 게임 상태 변수
+var gameState = {
+    hp: 100, maxHp: 100,
+    purity: 50, maxPurity: 100,
+    contam: 0, maxContam: 100,
+    day: 1, time: 'Day',
+    turnActive: false,
+    inventory: 3, maxInventory: 5,
+    qteActive: false,
+};
+var inventoryItems = ['holy_water', 'blessed_amulet', 'salt_gun'];
+
 var apiKey = "";
 var apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
 
-// --- 다국어 번역 데이터 ---
+// --- 다국어 번역 데이터 (이전과 동일) ---
 var translations = {
     ko: {
         'headerTitle': '퇴마 시뮬레이션: 그림자의 장', 'subTitle': '이단과 신성이 교차하는 세계에서, 당신의 선택이 운명을 결정합니다.', 'guideTitle': '시뮬레이션 가이드', 'guideTheme': '주제: 엑소시즘/퇴마 다크 판타지 로맨스 시뮬레이션입니다.', 'guideSystem': '시스템: 정화도, 오염도, 턴제 전투, QTE 히든 이벤트 등 시스템 중심 프롬프팅으로 진행됩니다.', 'btn_p1_next': 'Step 1. 캐릭터 WI 선택하기 →', 'step1Title': 'Step 1. 캐릭터 WI 토글: 활성화할 조력자/존재를 선택하세요', 'guideToggle': '[가이드] 선택한 캐릭터의 WI만 ST의 채팅에 영향을 줍니다. 파트너 캐릭터를 Chat Char로 설정할 예정이라면 WI를 미리 켜두세요.', 'step2Title': 'Step 2. 시나리오 선택: 이야기의 시작점을 결정하세요', 'partnerTitle': '① 파트너와 함께 시작', 'partnerDesc': '파트너의 확정 프롤로그로 시작하며, Chat Char가 됩니다. 두 번 클릭하면 선택 해제됩니다.', 'randomTitle': '② 랜덤 시나리오 (자유 시작)', 'randomDesc': '파트너 없이 자유로운 설정으로 시작합니다.', 'rndPh': '예: 미카엘과 루시퍼가 동시에 등장하는 봉인 해제 시나리오.', 'btnRnd': '🎲 랜덤 시나리오 생성', 'previewTitle': '프롤로그 미리보기:', 'btnBackStart': '← 초기 화면으로 돌아가기', 'btnBackWI': '← WI 선택', 'btnFinal': '최종 확인 →', 'step4Title': '최종 설정 확인', 'summaryScenarioType': '시작 유형:', 'summaryPartnerName': '메인 Chat Char:', 'summaryActiveWIs': '활성화된 WI:', 'summaryPrologueTitle': '시작 프롤로그:', 'btnModify': '← 수정', 'btnStart': '▶️ 시뮬레이션 시작'
@@ -401,77 +420,19 @@ var translations = {
     }
 };
 
+
 // --- 기능 로직 ---
-// [NEW] 게임 상태 업데이트 로직 (HP, 정화도, 오염도)
-function updateGameStatus(type, value) {
-    value = parseInt(value);
-    if (isNaN(value)) return;
 
-    var barId, valueId, maxVal;
-    
-    if (type === 'hp') {
-        gameState.hp = Math.min(gameState.maxHp, Math.max(0, gameState.hp + value));
-        barId = 'hp_bar'; valueId = 'hp_value'; maxVal = gameState.maxHp;
-    } else if (type === 'purity') {
-        gameState.purity = Math.min(gameState.maxPurity, Math.max(0, gameState.purity + value));
-        barId = 'purity_bar'; valueId = 'purity_value'; maxVal = gameState.maxPurity;
-    } else if (type === 'contam') {
-        gameState.contam = Math.min(gameState.maxContam, Math.max(0, gameState.contam + value));
-        barId = 'contam_bar'; valueId = 'contam_value'; maxVal = gameState.maxContam;
-    } else {
-        return;
-    }
+// [NEW] 함수를 Window 객체에 노출 (LaLib 연동용)
+window.go = go;
+window.tWI = tWI;
+window.selP = selP;
+window.generateRandomScenario = generateRandomScenario;
+window.updateGameStatus = updateGameStatus;
+window.updateDateTime = updateDateTime;
+window.toggleTurnSystem = toggleTurnSystem;
+window.handleQTE = handleQTE;
 
-    var percentage = (gameState[type] / maxVal) * 100;
-    document.getElementById(barId).style.width = percentage + '%';
-    document.getElementById(valueId).innerText = gameState[type] + ' / ' + maxVal;
-    
-    console.log(`[STATUS UPDATED] ${type}: ${gameState[type]}`);
-}
-
-// [NEW] 날짜 및 시간 업데이트
-function updateDateTime(days, time) {
-    gameState.day = parseInt(days);
-    gameState.time = time;
-    document.getElementById('game_date').innerText = `Day ${gameState.day}, ${gameState.time}`;
-    console.log(`[TIME UPDATED] Day ${gameState.day}, ${gameState.time}`);
-}
-
-// [NEW] 턴제 시스템 활성화/비활성화
-function toggleTurnSystem(activeStatus) {
-    var statusEl = document.getElementById('turn_status');
-    var isActive = activeStatus === 'START';
-    gameState.turnActive = isActive;
-
-    if (isActive) {
-        statusEl.innerText = (currentLang === 'ko' ? "턴 활성화: 당신의 턴" : "Turn Active: Your Turn");
-        statusEl.classList.remove('text-red-400');
-        statusEl.classList.add('text-green-400');
-    } else {
-        statusEl.innerText = (currentLang === 'ko' ? "대기 중" : "Awaiting Command");
-        statusEl.classList.remove('text-green-400');
-        statusEl.classList.add('text-red-400');
-    }
-    console.log(`[TURN SYSTEM] ${activeStatus}`);
-}
-
-// [NEW] QTE 이벤트 핸들러 (로직은 Step 5에서 완성)
-function handleQTE(type, prompt) {
-    if (gameState.qteActive) return; // 이미 QTE 중이면 무시
-    gameState.qteActive = true;
-    
-    var popup = document.getElementById('qte_popup');
-    var inputEl = document.getElementById('qte_input');
-    
-    popup.classList.remove('hidden');
-    document.getElementById('qte_prompt').innerText = prompt;
-    
-    inputEl.value = '';
-    inputEl.focus(); // 입력 필드에 포커스
-
-    // [Step 5에서 QTE의 타이머 및 입력 로직이 완성됩니다]
-    console.log(`[QTE TRIGGERED] Type: ${type}, Prompt: ${prompt}`);
-}
 
 function go(id) {
     document.querySelectorAll('div[id^="p"]').forEach(function(d) { d.classList.add('hidden'); });
@@ -486,6 +447,7 @@ function go(id) {
         updateScenarioPreview(state.scType);
     }
     if (id === 'p4') renderSum();
+    if (id === 'p5') updateInventoryUI();
 }
 
 function updateLang(lang) {
@@ -508,7 +470,6 @@ function updateLang(lang) {
     }
 }
 
-// Page 2: WI 토글 렌더링
 function renderWI() {
     var grid = document.getElementById('grid_wi');
     var html = "";
@@ -528,12 +489,10 @@ function renderWI() {
 }
 
 function tWI(id, el) {
-    // [2. WI/파트너 연동] P2에서 수동으로 토글 시 state.wis 업데이트
     if (state.wis.includes(id)) { state.wis = state.wis.filter(function(x) { return x !== id; }); el.classList.remove('selected'); }
     else { state.wis.push(id); el.classList.add('selected'); }
 }
 
-// Page 3: 파트너 선택 렌더링
 function renderP() {
     var grid = document.getElementById('grid_partner');
     var html = "";
@@ -551,26 +510,19 @@ function renderP() {
     if (state.pid) { grid.classList.add('one-selected'); } else { grid.classList.remove('one-selected'); }
 }
 
-// 파트너 선택/해제 토글 로직
 function selP(id) {
     var partner = chars.find(function(c) { return c.id === id; });
 
     if (state.pid === id) {
-        // 더블 클릭 (선택 해제)
-
-        // [2. WI/파트너 연동] 선택 해제 시 WI 목록에서도 제거
         state.wis = state.wis.filter(function(x) { return x !== id; });
-
         state.pid = null;
         state.scType = 'none';
         state.scText = '';
     } else {
-        // 새 파트너 선택
         state.pid = id;
         state.scType = 'partner';
         state.scText = partner.text;
 
-        // [2. WI/파트너 연동] 새 파트너 선택 시 WI 목록에 강제 추가
         if (!state.wis.includes(id)) {
             state.wis.push(id);
         }
@@ -580,7 +532,6 @@ function selP(id) {
     updateScenarioPreview(state.scType);
 }
 
-// 시나리오 미리보기 업데이트 및 버튼 활성화
 function updateScenarioPreview(type) {
     var previewDiv = document.getElementById('preview');
     var textP = document.getElementById('previewText');
@@ -602,26 +553,23 @@ function updateScenarioPreview(type) {
     textP.innerText = msg;
 }
 
-// 랜덤 시나리오 생성 (API)
-document.getElementById('btnRnd').onclick = async function() {
-    var btn = this;
+async function generateRandomScenario() {
+    var btn = document.getElementById('btnRnd');
     var input = document.getElementById('rndIn').value;
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner mr-2"></span> ' + (currentLang === 'ko' ? '생성 중...' : 'Generating...');
 
-    // 파트너 선택 해제 (자유 시작)
     state.pid = null;
     renderP();
 
-    // [3. 랜덤 프롬프트 강화] 활성화된 WI 목록을 가져와 프롬프트에 삽입
     var activeCharNames = chars.filter(function(c) { return state.wis.includes(c.id); }).map(function(c) { return c.name; });
     var charPrompt = "";
 
     if (activeCharNames.length > 0) {
         charPrompt = (currentLang === 'ko' ?
-            `현재 WI가 활성화된 캐릭터 목록은 [${activeCharNames.join(', ')}] 입니다. 이 중 1~3명의 캐릭터를 시나리오에 포함해주세요. (필수 아님, 시나리오 완성도를 위해 등장하지 않아도 무방)` :
-            `The following characters have active Wits: [${activeCharNames.join(', ')}]. Please integrate 1 to 3 of them into the scenario, but feel free to omit them if it fits the narrative better.`);
+            `현재 WI가 활성화된 캐릭터 목록은 [${activeCharNames.join(', ')}] 입니다. 이 중 1~3명의 캐릭터를 시나리오에 포함해주세요.` :
+            `The following characters have active Wits: [${activeCharNames.join(', ')}]. Please integrate 1 to 3 of them into the scenario.`);
     } else {
          charPrompt = (currentLang === 'ko' ?
             `현재 활성화된 WI 캐릭터는 없습니다. 시나리오는 완전히 자유로운 주제로 생성해주세요.` :
@@ -663,9 +611,8 @@ document.getElementById('btnRnd').onclick = async function() {
     btn.disabled = false;
     btn.innerHTML = (currentLang === 'ko') ? '🎲 랜덤 시나리오 생성' : '🎲 Generate Random Scenario';
     updateScenarioPreview(state.scType);
-};
+}
 
-// Page 4: 요약
 function renderSum() {
     var p = chars.find(function(c) { return c.id === state.pid; });
     var pName = p ? p.name : (currentLang === 'ko' ? "없음 (자유 시작)" : "None (Free Start)");
@@ -678,39 +625,193 @@ function renderSum() {
     document.getElementById('summary_text').innerText = state.scText;
 }
 
-// 최종 시작
 document.getElementById('btnStart').onclick = function() {
     var partnerId = state.pid || 'default';
-
-    // 최종 WI 목록은 현재 state.wis에 저장되어 있으며, selP에서 이미 Chat Char가 포함/제거 처리됨.
     var finalWIs = state.wis.slice();
 
-    // 활성화된 WI 중 메인 파트너(Chat Char)는 제외 (ST의 set_wits 기능에 맞춤)
     var wits = finalWIs.filter(function(id) { return id !== partnerId; }).join(',');
     var text = document.getElementById('summary_text').innerText;
 
     var initialPrompt = (currentLang === 'ko' ?
-        `[시뮬레이션 시작 - 메인 상대: ${partnerId}] 당신의 임무가 시작되었습니다. 현재 시나리오: "${text}". 이 스크립트에 이어서 첫 대사를 시작하세요. 앞으로 시스템 기반 프롬프팅으로 진행됩니다. (활성 WI: ${wits})` :
-        `[SIM START - Main Target: ${partnerId}] Your mission begins. Scenario: "${text}". Continue with the first response. The session will now proceed with system-based prompting. (Active WIs: ${wits})`);
+        `[SIM START - Main Target: ${partnerId}] 당신의 임무가 시작되었습니다. 현재 시나리오: "${text}". 이 스크립트에 이어서 첫 대사를 시작하세요. [OPEN_UI: Exorcism_Gothic_I18n_Game_UI_Final.html] 앞으로 시스템 기반 프롬프팅으로 진행됩니다. (활성 WI: ${wits})` :
+        `[SIM START - Main Target: ${partnerId}] Your mission begins. Scenario: "${text}". Continue with the first response. [OPEN_UI: Exorcism_Gothic_I18n_Game_UI_Final.html] The session will now proceed with system-based prompting. (Active WIs: ${wits})`);
 
-    var cmd = '/run set_char ' + partnerId + '; /run set_wits ' + wits + '; /next_response ' + initialPrompt;
+    // ST 명령: set_char, set_wits를 직접 입력하도록 안내
 
-    alert("ST 실행 명령어 (복사됨):\n" + cmd);
+    alert((currentLang === 'ko' ? "시뮬레이션 설정을 완료했습니다. ST 채팅창으로 돌아가서 아래 명령어를 첫 메시지로 입력하세요:" : "Configuration complete. Return to the ST chat and enter the following commands as your first message:") +
+          `\n\n/set_char ${partnerId}\n/set_wits ${wits}\n\n` +
+          (currentLang === 'ko' ? "그리고 다음 메시지를 보내 대화를 시작하세요:" : "Then send this message to start the conversation:") +
+          `\n\n${initialPrompt}`);
 
-    go('p5');
+    go('p1');
+    state = { wis: [], pid: null, scType: 'none', scText: '', currentPage: 'p1' };
 };
 
-// --- 초기화 및 이벤트 리스너 ---
+
+// [NEW] 게임 상태 업데이트 로직 (HP, 정화도, 오염도)
+function updateGameStatus(type, value) {
+    value = parseInt(value);
+    if (isNaN(value)) return;
+
+    var barId, valueId, maxVal;
+
+    if (type === 'hp') {
+        gameState.hp = Math.min(gameState.maxHp, Math.max(0, gameState.hp + value));
+        barId = 'hp_bar'; valueId = 'hp_value'; maxVal = gameState.maxHp;
+    } else if (type === 'purity') {
+        gameState.purity = Math.min(gameState.maxPurity, Math.max(0, gameState.purity + value));
+        barId = 'purity_bar'; valueId = 'purity_value'; maxVal = gameState.maxPurity;
+    } else if (type === 'contam') {
+        gameState.contam = Math.min(gameState.maxContam, Math.max(0, gameState.contam + value));
+        barId = 'contam_bar'; valueId = 'contam_value'; maxVal = gameState.maxContam;
+    } else {
+        return;
+    }
+
+    var percentage = (gameState[type] / maxVal) * 100;
+    document.getElementById(barId).style.width = percentage + '%';
+    document.getElementById(valueId).innerText = gameState[type] + ' / ' + maxVal;
+
+    if (gameState.hp <= 0 || gameState.contam >= 100) {
+        toggleTurnSystem('END');
+        alert((currentLang === 'ko' ? "시뮬레이션 종료: HP 고갈 또는 오염도 한계" : "Simulation Ended: HP Depletion or Contamination Limit"));
+    }
+}
+
+// [NEW] 날짜 및 시간 업데이트
+function updateDateTime(days, time) {
+    gameState.day = parseInt(days);
+    gameState.time = time;
+    document.getElementById('game_date').innerText = `Day ${gameState.day}, ${gameState.time}`;
+}
+
+// [NEW] 턴제 시스템 활성화/비활성화
+function toggleTurnSystem(activeStatus) {
+    var statusEl = document.getElementById('turn_status');
+    var isActive = activeStatus === 'START';
+    gameState.turnActive = isActive;
+
+    if (isActive) {
+        statusEl.innerText = (currentLang === 'ko' ? "턴 활성화: 당신의 턴" : "Turn Active: Your Turn");
+        statusEl.classList.remove('text-red-400');
+        statusEl.classList.add('text-green-400');
+    } else {
+        statusEl.innerText = (currentLang === 'ko' ? "대기 중" : "Awaiting Command");
+        statusEl.classList.remove('text-green-400');
+        statusEl.classList.add('text-red-400');
+    }
+}
+
+// [NEW] 인벤토리 UI 업데이트
+function updateInventoryUI() {
+    gameState.inventory = inventoryItems.length;
+    document.getElementById('item_slots').innerText = `${gameState.inventory} / ${gameState.maxInventory}`;
+}
+
+// [NEW] QTE 이벤트 핸들러 (로직 완성)
+function handleQTE(type, prompt) {
+    if (gameState.qteActive) return;
+    gameState.qteActive = true;
+
+    var popup = document.getElementById('qte_popup');
+    var inputEl = document.getElementById('qte_input');
+    var timerEl = document.getElementById('qte_timer');
+    var feedbackEl = document.getElementById('qte_feedback');
+
+    var timeLimit = 5;
+    var timer;
+
+    popup.classList.remove('hidden');
+    inputEl.classList.remove('hidden');
+    inputEl.value = '';
+    inputEl.focus();
+    feedbackEl.innerText = '';
+
+    document.getElementById('qte_prompt').innerText = prompt;
+    document.getElementById('qte_title').innerText = (currentLang === 'ko' ? "긴급 QTE 발동!" : "Emergency QTE Triggered!");
+
+    var finishQTE = function(isSuccess) {
+        clearInterval(timer);
+        gameState.qteActive = false;
+
+        var resultCmd = isSuccess ? 'SUCCESS' : 'FAILURE';
+        var resultText = isSuccess ? (currentLang === 'ko' ? "성공! 피해를 방어했습니다." : "SUCCESS! Damage avoided.") : (currentLang === 'ko' ? "실패! 충격이 옵니다." : "FAILURE! You take damage.");
+
+        feedbackEl.innerText = resultText;
+        feedbackEl.classList.remove('text-green-500', 'text-red-500');
+        feedbackEl.classList.add(isSuccess ? 'text-green-500' : 'text-red-500');
+
+        var cmd = `/next_response [QTE_RESULT: ${resultCmd}] ${isSuccess ? 'QTE 성공으로 위기를 극복했습니다.' : 'QTE 실패로 치명적인 공격을 받았습니다.'}`;
+
+        setTimeout(function() {
+            popup.classList.add('hidden');
+        }, 2000);
+
+        // QTE 결과는 ST 채팅으로 직접 전송하도록 안내
+        alert((currentLang === 'ko' ? "QTE 완료. ST 채팅창으로 돌아가 아래 명령어를 입력하여 대화를 이어가세요." : "QTE Complete. Return to ST chat and enter the command below to continue.") + `\n\n${cmd}`);
+    };
+
+    // --- 타이머 시작 ---
+    var timeLeft = timeLimit;
+    timerEl.innerText = (currentLang === 'ko' ? `남은 시간: ${timeLeft}초` : `Time Left: ${timeLeft}s`);
+
+    timer = setInterval(function() {
+        timeLeft--;
+        timerEl.innerText = (currentLang === 'ko' ? `남은 시간: ${timeLeft}초` : `Time Left: ${timeLeft}s`);
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            finishQTE(false);
+        }
+    }, 1000);
+
+    // --- QTE 타입별 로직 ---
+    if (type === 'TYPING') {
+        inputEl.placeholder = (currentLang === 'ko' ? "여기에 구절을 빠르게 입력하세요..." : "Type the holy verse quickly here...");
+
+        inputEl.oninput = function() {
+            if (this.value.trim() === prompt) {
+                this.oninput = null;
+                finishQTE(true);
+            }
+        };
+
+    } else if (type === 'SPACEBAR') {
+        var targetCount = 20;
+        var currentCount = 0;
+        inputEl.classList.add('hidden');
+        document.getElementById('qte_prompt').innerText = (currentLang === 'ko' ? `[스페이스바 연타!] ${prompt}: ${currentCount}/${targetCount}회` : `[Spacebar Mash!] ${prompt}: ${currentCount}/${targetCount} times`);
+
+        var spaceHandler = function(e) {
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                currentCount++;
+                document.getElementById('qte_prompt').innerText = (currentLang === 'ko' ? `[스페이스바 연타!] ${prompt}: ${currentCount}/${targetCount}회` : `[Spacebar Mash!] ${prompt}: ${currentCount}/${targetCount} times`);
+
+                if (currentCount >= targetCount) {
+                    document.removeEventListener('keydown', spaceHandler);
+                    finishQTE(true);
+                }
+            }
+        };
+
+        document.addEventListener('keydown', spaceHandler);
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
-    // 언어 선택 이벤트
     document.getElementById('langSelect').addEventListener('change', function() {
         currentLang = this.value;
         go(state.currentPage);
     });
 
-    // 초기 시작
+    document.getElementById('btnRnd').onclick = generateRandomScenario;
+
+    // 최종 시작 버튼은 위에 정의된 익명 함수로 대체되었습니다.
+
     go('p1');
 });
-   </script>
+      </script>
 </body>
 </html>
